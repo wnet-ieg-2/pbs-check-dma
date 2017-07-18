@@ -20,9 +20,14 @@ PBS Check DMA includes the following files:
 4. Click on *Activate*
 5. Navigate to *Settings* and select *PBS Check DMA Settings* 
 
+## Usage
+
+* Add the shortcode 'pbs-check-dma' to any page to invoke the dma checker.  
+* TK add arguments for 'matched-div' and 'failed-div' to specify CSS divs that will be displayed based on whether the visitor is in the station's DMA
+
 ## Changelog
 
-0.1 2015-09-11 Initial base code
+0.1 2017-07-18 Initial base code
 
 
 ## License
