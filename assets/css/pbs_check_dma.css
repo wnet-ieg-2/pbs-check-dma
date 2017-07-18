@@ -1,0 +1,63 @@
+#wnet_pledge_premiums_messages {
+  margin-right: 3%;
+}
+
+#wnet_pledge_premiums button{
+  border-style: solid;
+  padding     : .5em;
+  border-color: #ccc;
+  border-width: 1px;
+  border-radius: 5px;
+  -webkit-border-radius: 5;
+  -moz-border-radius: 5;
+  box-shadow: 0;
+  background-color: #e8e8e8;
+  font-family : inherit;
+  cursor      : pointer;
+}
+#wnet_pledge_premiums button .fa {
+  color: #008cb6;
+}
+#pledge_overlay {
+  padding: 1em 2em;
+  margin: 0;
+}
+#pledge_overlay h3 {
+  cursor: pointer;
+}
+#pledge_overlay .pledge_programs_list {
+  margin: 0;
+  padding: 0;
+}
+
+#pledge_overlay a h3, #pledge_overlay h3 a, #pledge_overlay h2 a {
+  color: #333;
+}
+
+#pledge_overlay .pledge_programs_list h3 {
+  margin: 1em 0;
+  padding: 1em 0 0 0;
+  border-top: 1px solid #ccc;
+  outline:none;
+}
+
+#pledge_premiums_list .fa {
+  margin-right: 0.5em;
+  color: #008cb6;
+}
+#pledge_premiums_list .fa-caret-square-o-up {
+  color: red;
+}
+
+#pledge_overlay .pledge_programs_list li {
+  cursor      : pointer;
+  margin-left: 1.5em;
+  margin-top: 1em;
+}
+
+#pledge_overlay .additional_text p {
+  font-style: italic; 
+}
+#pledge_overlay .program_list_header{
+  margin-top: 1em;
+}
