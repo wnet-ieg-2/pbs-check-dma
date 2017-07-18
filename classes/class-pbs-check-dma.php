@@ -29,7 +29,7 @@ class PBS_Check_DMA {
     add_filter( 'template_include', array( $this, 'use_custom_template' ) );
 
     // Setup the shortcode
-    add_shortcode( 'pbs_check_dma', array($this, 'do_shortcode') );
+    add_shortcode( 'pbs-check-dma', array($this, 'do_shortcode') );
 
 	}
 

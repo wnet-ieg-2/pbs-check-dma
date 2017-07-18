@@ -36,7 +36,7 @@ jQuery(document).ready(function($) {
       console.log('client ip not set');
       return;
     }
-    var zip_url = 'http://services.pbs.org/zipcodes/ip/';
+    var zip_url = '//services.pbs.org/zipcodes/ip/';
     if (client_zip) {
       getStationsByZip(client_zip);
     } else {
@@ -47,7 +47,7 @@ jQuery(document).ready(function($) {
         cache: true,
         success: function(response) {
           console.log('got a response');
-          client_zip = response.items[0].zipcode;
+          client_zip = response.$items[0].zipcode;
           getStationsByZip(client_zip);
         },
         timeout: 1000,
@@ -59,17 +59,31 @@ jQuery(document).ready(function($) {
   }
 
   function getStationsByZip(zipcode) {
-    var stations_url = 'http://services.pbs.org/callsigns/zip/';
+    var stations_url = '//services.pbs.org/callsigns/zip/';
     $.ajax({
-      url: stations_url + zipcode + '.json?format=jsonp&callback=callme',
+      url: stations_url + zipcode + '.json?format=jsonp',
       dataType: 'jsonp',
+      jsonpCallback: 'callme',
       cache: true,
       success: function(response) {
-        if (typeof response.items[0] !== "undefined") {
-          renderStationList(response);
+        if (typeof response.$items[0] !== "undefined") {
+          checkForStation(response.$items);
         }
       }             
     });
+  }
+
+  function checkForStation(arr) {
+    var station_call_letters = args.station_call_letters;
+    for (var i = 0, len=arr.length; i < len; i++) {
+      var callsign = arr[i].$links[0].callsign;
+      console.log(callsign);
+      if ((arr[i].confidence == 100) && (callsign == station_call_letters)) {
+        console.log('found');
+        // set station cookie and exit
+      }
+    }
+    // still not found?  show the list
   }
 
 
