@@ -10,6 +10,19 @@ jQuery(document).ready(function($) {
   var client_zip = false;
   var client_station = false;
 
+  var cboxOptions = {
+      inline: true,
+      closeButton: false,
+      height: "90%",
+      width: "90%",
+      initialWidth: "90%",
+      initialHeight: "90%",
+      maxWidth: '90%',
+      maxHeight: '90%',
+      scrolling: true
+    }
+
+
   function getClientIP() {
     var ip_url = args.ip_endpoint;
     if (client_ip) {
@@ -83,11 +96,24 @@ jQuery(document).ready(function($) {
         // set station cookie and exit
       }
     }
-    // still not found?  show the list
+    renderStationFinder(arr);
   }
 
 
-  function renderStationList(response) {
+  function renderStationFinder(arr) {
+    console.log('rendering the list');
+    $.colorbox(cboxOptions);
+
+var output = '<div id="pbs-stations-list" class="pbs-modal pbs-stations-list" role="dialog" aria-labeledby="enterZipCodeTitle" tabindex="0" data-pass-focus-on-shift-tab-to="pbs-close-popup"> <!-- modal window --> <!-- title --><div class="modalTitle"><h2 id="enterZipCodeTitle">Confirm Your Local Station</h2></div> <!-- content --><div class="modalContent" role="document"><div class="autoLocalizationContainer localizationStationList"><div class="autoLocalizationText"><p><span>To help you find your favorite shows and great local content, we\'ve selected a PBS station in your area.</span><span class="paragraph">Please confirm that <span class="regionalDefaultStation">THIRTEEN</span><span class="regionalDefaultStationMobile">THIRTEEN</span> is your preferred local station, or choose another station below.</span></p></div><div class="modalStationImage"><img src="//image.pbs.org/station-images/StationColorProfiles/color/WNET.png.resize.106x106.png" alt="THIRTEEN"></div></div><div class="autoLocalizationContainer localizationStationListNoStations none"><div class="autoLocalizationText"><p>There are no stations available for your selected zip code.</p></div></div> <section id="autoSelectStation" class="" style="-ms-overflow-y:auto;"><!-- DO NOT DELETE --> <div class="stationsList" id="autoStationsList"> <button id="WNET" class="stationItem active" data-donate_url="http://support.thirteen.org/pbsdonate" data-common_name="THIRTEEN/WNET New York" data-zipcode="10019" aria-pressed="true"><h3><strong class="commonName">THIRTEEN/WNET New York</strong><strong class="shortCommonName">THIRTEEN</strong></h3><span>New York, NY</span></button> <button id="WEDH" class="stationItem" data-donate_url="https://www.callswithoutwalls.com/pledgeCart3/?campaign=749BE753-2AFD-4A51-9809-72EE1DA352B6&amp;source=ASW0000WBPBS" data-common_name="CONNECTICUT PUBLIC TELEVISION" data-zipcode="6105" aria-pressed="false"><h3><strong class="commonName">CONNECTICUT PUBLIC TELEVISION</strong><strong class="shortCommonName">CPTV</strong></h3><span>Hartford, CT</span></button> </div> </section> <div class="modalBottomContainer localizationStationList"><button id="moreStations" class="showStatesModal modal-button widthMedium">More Stations</button><button id="confirmStation" class="modalConfirmStation modal-button baseBlue widthMedium">Confirm Station</button></div><div id="noStations" class="modalBottomContainer localizationStationListNoStations none"><button id="backButton" class="zipBackButton modal-button baseBlue widthMedium">Back</button></div> </div><!-- end of content --><button id="pbs-close-popup" class="closeBtn" data-pass-focus-on-tab-to="pbs-stations-list" aria-label="Dismiss"> × </button></div>';
+
+
+    $('#cboxContent').html(output);
+  }
+
+
+
+
+  function renderProgramList(response) {
     var output = '<div id="pledge_overlay"><h2>Select a thank-you gift:</h2><div class="pledge_programs_list"><ul><li><a class="premium" data-pcode="" data-price=0><span class="title">No gift, I want all of my pledge to go towards supporting this station</span></a></li></ul></div>';
     var active_panel = false;
     var featured_programs = null;
@@ -159,6 +185,8 @@ jQuery(document).ready(function($) {
   function cbresize() {
     $.colorbox.resize(cboxOptions);
   }
+
+
   function formatPremiumList(program) {
     var output = '<ul>';
     $.each(program.premiums, function(idx, premium) {
@@ -178,19 +206,6 @@ jQuery(document).ready(function($) {
   }
 
 
-
-
-  var cboxOptions = {
-      inline: true,
-      closeButton: false, 
-      height: "90%",
-      width: "90%",
-      initialWidth: "90%",
-      initialHeight: "90%",
-      maxWidth: '90%',
-      maxHeight: '90%',
-      scrolling: true
-    }
 
   $(window).resize(function(){
     $.colorbox.resize({
