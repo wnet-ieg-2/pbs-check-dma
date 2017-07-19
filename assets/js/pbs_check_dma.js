@@ -13,13 +13,9 @@ jQuery(document).ready(function($) {
   var cboxOptions = {
       inline: true,
       closeButton: false,
-      height: "90%",
-      width: "90%",
-      initialWidth: "90%",
-      initialHeight: "90%",
-      maxWidth: '90%',
-      maxHeight: '90%',
-      scrolling: true
+      height: "526",
+      width: "600",
+      scrolling: false 
     }
 
 
@@ -90,10 +86,10 @@ jQuery(document).ready(function($) {
     var station_call_letters = args.station_call_letters;
     for (var i = 0, len=arr.length; i < len; i++) {
       var callsign = arr[i].$links[0].callsign;
-      console.log(callsign);
       if ((arr[i].confidence == 100) && (callsign == station_call_letters)) {
-        console.log('found');
+        console.log('found my station');
         // set station cookie and exit
+        return;
       }
     }
     renderStationFinder(arr);
@@ -101,13 +97,34 @@ jQuery(document).ready(function($) {
 
 
   function renderStationFinder(arr) {
-    console.log('rendering the list');
+    var first_option_callsign = false;
+    var first_option_short_common_name = false;
+    var station_button_list = '';
+    for (var i = 0, len=arr.length; i < len; i++) {
+      var callsign = arr[i].$links[0].callsign;
+      var common_name = arr[i].$links[0].$links[0].common_name;
+      var short_common_name = arr[i].$links[0].$links[0].short_common_name;
+      var mailing_city = arr[i].$links[0].$links[0].mailing_city;
+      var mailing_state = arr[i].$links[0].$links[0].mailing_state;
+      if (! first_option_callsign) {
+        first_option_callsign = callsign;
+        first_option_short_common_name = short_common_name;
+      }
+      if (arr[i].confidence == 100) {
+        station_button_list += '<button id="' + callsign + '" class="stationItem active" data-common_name="' + common_name + '" aria-pressed="true"><h3><strong class="commonName">' + common_name + '</strong><strong class="shortCommonName">' + short_common_name + '</strong></h3><span>' + mailing_city + ', ' + mailing_state + '</span></button>';
+      }
+    }
+
     $.colorbox(cboxOptions);
 
-var output = '<div id="pbs-stations-list" class="pbs-modal pbs-stations-list" role="dialog" aria-labeledby="enterZipCodeTitle" tabindex="0" data-pass-focus-on-shift-tab-to="pbs-close-popup"> <!-- modal window --> <!-- title --><div class="modalTitle"><h2 id="enterZipCodeTitle">Confirm Your Local Station</h2></div> <!-- content --><div class="modalContent" role="document"><div class="autoLocalizationContainer localizationStationList"><div class="autoLocalizationText"><p><span>To help you find your favorite shows and great local content, we\'ve selected a PBS station in your area.</span><span class="paragraph">Please confirm that <span class="regionalDefaultStation">THIRTEEN</span><span class="regionalDefaultStationMobile">THIRTEEN</span> is your preferred local station, or choose another station below.</span></p></div><div class="modalStationImage"><img src="//image.pbs.org/station-images/StationColorProfiles/color/WNET.png.resize.106x106.png" alt="THIRTEEN"></div></div><div class="autoLocalizationContainer localizationStationListNoStations none"><div class="autoLocalizationText"><p>There are no stations available for your selected zip code.</p></div></div> <section id="autoSelectStation" class="" style="-ms-overflow-y:auto;"><!-- DO NOT DELETE --> <div class="stationsList" id="autoStationsList"> <button id="WNET" class="stationItem active" data-donate_url="http://support.thirteen.org/pbsdonate" data-common_name="THIRTEEN/WNET New York" data-zipcode="10019" aria-pressed="true"><h3><strong class="commonName">THIRTEEN/WNET New York</strong><strong class="shortCommonName">THIRTEEN</strong></h3><span>New York, NY</span></button> <button id="WEDH" class="stationItem" data-donate_url="https://www.callswithoutwalls.com/pledgeCart3/?campaign=749BE753-2AFD-4A51-9809-72EE1DA352B6&amp;source=ASW0000WBPBS" data-common_name="CONNECTICUT PUBLIC TELEVISION" data-zipcode="6105" aria-pressed="false"><h3><strong class="commonName">CONNECTICUT PUBLIC TELEVISION</strong><strong class="shortCommonName">CPTV</strong></h3><span>Hartford, CT</span></button> </div> </section> <div class="modalBottomContainer localizationStationList"><button id="moreStations" class="showStatesModal modal-button widthMedium">More Stations</button><button id="confirmStation" class="modalConfirmStation modal-button baseBlue widthMedium">Confirm Station</button></div><div id="noStations" class="modalBottomContainer localizationStationListNoStations none"><button id="backButton" class="zipBackButton modal-button baseBlue widthMedium">Back</button></div> </div><!-- end of content --><button id="pbs-close-popup" class="closeBtn" data-pass-focus-on-tab-to="pbs-stations-list" aria-label="Dismiss"> × </button></div>';
-
-
+    var confirm_wrapper_template = '<div id="pbs-stations-list" class="pbs-modal pbs-stations-list" role="dialog" aria-labeledby="enterZipCodeTitle" tabindex="0" data-pass-focus-on-shift-tab-to="pbs-close-popup"> <!-- modal window --> <!-- title --><div class="modalTitle"><h2 id="enterZipCodeTitle">Confirm Your Local Station</h2></div> <!-- content --><div class="modalContent" role="document"><div class="autoLocalizationContainer localizationStationList"><div class="autoLocalizationText"><p><span>To help you find your favorite shows and great local content, we\'ve selected a PBS station in your area.</span><span class="paragraph">Please confirm that <span class="regionalDefaultStation"></span><span class="regionalDefaultStationMobile"></span> is your preferred local station, or choose another station below.</span></p></div><div class="modalStationImage"></div></div><div class="autoLocalizationContainer localizationStationListNoStations none"><div class="autoLocalizationText"><p>There are no stations available for your selected zip code.</p></div></div> <section id="autoSelectStation" class="" style="-ms-overflow-y:auto;"><!-- DO NOT DELETE --> <div class="stationsList" id="autoStationsList"></div> </section> <div class="modalBottomContainer localizationStationList"><button id="moreStations" class="showStatesModal modal-button widthMedium">More Stations</button><button id="confirmStation" class="modalConfirmStation modal-button baseBlue widthMedium">Confirm Station</button></div><div id="noStations" class="modalBottomContainer localizationStationListNoStations none"><button id="backButton" class="zipBackButton modal-button baseBlue widthMedium">Back</button></div> </div><!-- end of content --><button id="pbs-close-popup" class="closeBtn" data-pass-focus-on-tab-to="pbs-stations-list" aria-label="Dismiss"> × </button></div>'; 
+    
+    var output = confirm_wrapper_template;
+    
     $('#cboxContent').html(output);
+    $('#pbs-stations-list .regionalDefaultStation, #pbs-stations-list .regionalDefaultStationMobile').text(first_option_short_common_name);
+    $('#pbs-stations-list .modalStationImage').html('<img src="//image.pbs.org/station-images/StationColorProfiles/color/' + first_option_callsign + '.png.resize.106x106.png" alt="' + first_option_short_common_name + '">');
+    $('#autoStationsList').html(station_button_list);
   }
 
 
