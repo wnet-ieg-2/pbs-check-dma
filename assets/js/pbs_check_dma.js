@@ -13,7 +13,6 @@ jQuery(document).ready(function($) {
   var cboxOptions = {
       inline: true,
       closeButton: false,
-      height: "526",
       width: "600",
       scrolling: false 
     }
@@ -148,6 +147,7 @@ jQuery(document).ready(function($) {
         station_button_list += '<button id="' + callsign + '" class="stationItem' + activeclass + '" data-donate_url="' + membership_url + '" data-common_name="' + common_name + '" aria-pressed="' + ariapressed +'"><h3><strong class="commonName">' + common_name + '</strong><strong class="shortCommonName">' + short_common_name + '</strong></h3><span>' + mailing_city + ', ' + mailing_state + '</span></button>';
       }
     }
+    cboxOptions['height'] = 526;
     $.colorbox(cboxOptions);
 
     var confirm_wrapper_template = '<div id="pbs-stations-list" class="pbs-modal pbs-stations-list" role="dialog" aria-labeledby="enterZipCodeTitle" tabindex="0" data-pass-focus-on-shift-tab-to="pbs-close-popup"> <!-- modal window --> <!-- title --><div class="modalTitle"><h2 id="enterZipCodeTitle">Confirm Your Local Station</h2></div> <!-- content --><div class="modalContent" role="document"><div class="autoLocalizationContainer localizationStationList"><div class="autoLocalizationText"><p><span>To help you find your favorite shows and great local content, we\'ve selected a PBS station in your area.</span><span class="paragraph">Please confirm that <span class="regionalDefaultStation"></span><span class="regionalDefaultStationMobile"></span> is your preferred local station, or choose another station below.</span></p></div><div class="modalStationImage"></div></div><div class="autoLocalizationContainer localizationStationListNoStations none"><div class="autoLocalizationText"><p>There are no stations available for your selected zip code.</p></div></div> <section id="autoSelectStation" class="" style="-ms-overflow-y:auto;"><!-- DO NOT DELETE --> <div class="stationsList" id="autoStationsList"></div> </section> <div class="modalBottomContainer localizationStationList"><button id="moreStations" class="showStatesModal modal-button widthMedium">More Stations</button><button id="confirmStation" class="modalConfirmStation modal-button baseBlue widthMedium">Confirm Station</button></div><div id="noStations" class="modalBottomContainer localizationStationListNoStations none"><button id="backButton" class="zipBackButton modal-button baseBlue widthMedium">Back</button></div> </div><!-- end of content --><button id="pbs-close-popup" class="closeBtn" data-pass-focus-on-tab-to="pbs-stations-list" aria-label="Dismiss"> × </button></div>'; 
@@ -168,9 +168,8 @@ jQuery(document).ready(function($) {
 
   function renderStationZipSelector() {
     var output = '<div id="pbs-find-stations" class="pbs-modal pbs-find-stations" role="dialog" tabindex="0" aria-labeledby="selectStationTitle" data-pass-focus-on-shift-tab-to="pbs-close-find-station"><!-- modal window --><!-- title --><div class="modalTitle"><h2 id="selectStationTitle">Find Your Local Station:</h2></div><!-- content --><div class="modalContent" role="document"><!-- enter zip code screen --><section id="enterZipCode"><div class="form"><div class="fieldset clearfix zipform"><input id="zipInput" pattern="[0-9]*" minlength="5" maxlength="5" name="zip" placeholder="ZIP Code" required="required" type="tel"><button id="searchByZip" class="modal-button baseBlue" data-atr="getByZip">Search by ZIP Code</button><p class="errorMsg none">Please enter a valid zip code</p></div><div class="fieldset clearfix regionform"><select name="" id="regionSelect"><option value="">Select State</option><option value="AL">Alabama</option><option value="AK">Alaska</option><option value="AS">American Samoa</option><option value="AZ">Arizona</option><option value="AR">Arkansas</option><option value="CA">California</option><option value="CO">Colorado</option><option value="CT">Connecticut</option><option value="DE">Delaware</option><option value="DC">District of Columbia</option><option value="FL">Florida</option><option value="GA">Georgia</option><option value="GU">Guam</option><option value="HI">Hawaii</option><option value="ID">Idaho</option><option value="IL">Illinois</option><option value="IN">Indiana</option><option value="IA">Iowa</option><option value="KS">Kansas</option><option value="KY">Kentucky</option><option value="LA">Louisiana</option><option value="ME">Maine</option><option value="MD">Maryland</option><option value="MA">Massachusetts</option><option value="MI">Michigan</option><option value="MN">Minnesota</option><option value="MS">Mississippi</option><option value="MO">Missouri</option><option value="MT">Montana</option><option value="NE">Nebraska</option><option value="NV">Nevada</option><option value="NH">New Hampshire</option><option value="NJ">New Jersey</option><option value="NM">New Mexico</option><option value="NY">New York</option><option value="NC">North Carolina</option><option value="ND">North Dakota</option><option value="OH">Ohio</option><option value="OK">Oklahoma</option><option value="OR">Oregon</option><option value="PA">Pennsylvania</option><option value="PR">Puerto Rico</option><option value="RI">Rhode Island</option><option value="SC">South Carolina</option><option value="SD">South Dakota</option><option value="TN">Tennessee</option><option value="TX">Texas</option><option value="UT">Utah</option><option value="VT">Vermont</option><option value="VI">Virgin Islands</option><option value="VA">Virginia</option><option value="WA">Washington</option><option value="WV">West Virginia</option><option value="WI">Wisconsin</option><option value="WY">Wyoming</option></select><button id="serchByRegion" class="modal-button baseBlue" data-atr="getByRegion">Search by State</button><p class="errorMsg none">Please select a region</p></div></div></section><button id="pbs-close-find-station" class="closeBtn" data-pass-focus-on-tab-to="pbs-find-stations" aria-label="Dismiss"> × </button></div><!-- end of content --></div>';
-    var selectorcboxOptions = cboxOptions;
-    delete selectorcboxOptions['height'];
-    $.colorbox(selectorcboxOptions);
+    delete cboxOptions['height'];
+    $.colorbox(cboxOptions);
     $('#cboxContent').html(output);
     $('#searchByZip').click(function(e) {
       e.preventDefault();
@@ -196,76 +195,6 @@ jQuery(document).ready(function($) {
 
   } 
 
-
-  function renderProgramList(response) {
-    var output = '<div id="pledge_overlay"><h2>Select a thank-you gift:</h2><div class="pledge_programs_list"><ul><li><a class="premium" data-pcode="" data-price=0><span class="title">No gift, I want all of my pledge to go towards supporting this station</span></a></li></ul></div>';
-    var active_panel = false;
-    var featured_programs = null;
-    if (typeof response.featured_programs !== "undefined") {
-      featured_programs = response.featured_programs;
-      output += '<div id="featured_premiums_list" class="pledge_programs_list">';
-      $.each(featured_programs, function(index, program) {
-        output += '<h3 id="' + program.slug + '">' + program.label + '</h3><div>';
-        output += formatPremiumList(program);
-        output += '</div>';
-      });
-      output += '</div>';
-    }
-    var additional_text = '';
-    if (typeof response.additional_text != "undefined") {
-      additional_text = '<div class="additional_text"><p>' + response.additional_text + '</p></div>';
-    }
-    if (typeof response.programs != "undefined") {
-      if (featured_programs) {
-        output += '<h2 class="program_list_header">Or, click on a program below to see more choices:</h2>';
-      } else {
-        output += '<h2 class="program_list_header">Click on a program below to see the available thank-you gifts:</h2>';
-      }
-      output += '<div id="pledge_premiums_list" class="pledge_programs_list">';
-      $.each(response.programs, function(index, program) {
-        output += '<h3 id="' + program.slug + '"><i class="fa fa-caret-square-o-down"></i>' + program.label + '</h3><div>';
-        output += formatPremiumList(program);
-        output += '</div>';
-      });
-      output += '</div>';
-    }
-    output += '</div>';
-    $('#cboxContent').html(output);
-	  $('#pledge_premiums_list').accordion({
-      active: active_panel,
-      collapsible: true,
-      heightStyle: "content",
-      animate: false,
-      icons: false,
-      activate: function( event, ui ) {
-        setTimeout(cbresize, 100);
-        $(".fa", ui.newHeader).removeClass("fa-caret-square-o-down").addClass("fa-caret-square-o-up");
-        $(".fa", ui.oldHeader).removeClass("fa-caret-square-o-up").addClass("fa-caret-square-o-down");
-      }      
-    });
-    $('#pledge_overlay').append(additional_text);
-    $('#pledge_overlay .additional_text').click(function() {
-      $.colorbox.close();
-    });
-    $('#pledge_overlay li a.premium').click(function(event) {
-      event.preventDefault();
-      $('#wnet_pledge_premiums button.launch').html("Change Selected Gift <i class='fa fa-minus-circle'></i>");
-      var prem_message = "Selected Gift: <b>"+ $("span.title", this).text() + "</b>";
-      var pricenum = Number($(this).attr("data-price"));
-      if (pricenum > 0){
-        prem_message = prem_message + ' $' + pricenum.toFixed(2);
-        if (args.form_type == 'sustainer'){
-          prem_message = prem_message + "/month, total annual contribution = " + (pricenum*12).toLocaleString('en-US', {style: 'currency', currency: 'USD' });
-        }
-      }
-      $('#wnet_pledge_premiums_messages').html(prem_message);
-      $('#wnet_pledge_premiums #pcode').text($(this).attr("data-pcode"));
-      $('#wnet_pledge_premiums #req_amt').text($(this).attr("data-price"));
-      $.colorbox.remove();
-    })
-  };
-
-  
   function cbresize() {
     $.colorbox.resize(cboxOptions);
   }
