@@ -29,7 +29,7 @@ class PBS_Check_DMA {
     add_filter( 'template_include', array( $this, 'use_custom_template' ) );
 
     // Setup the shortcode
-    add_shortcode( 'pbs-check-dma', array($this, 'do_shortcode') );
+    add_shortcode( $this->token, array($this, 'do_shortcode') );
 
 	}
 
@@ -69,11 +69,28 @@ class PBS_Check_DMA {
 
 
 
-  public function do_shortcode() {
-    // pull some things from sitewide settings if not set by the shortcode 
+  public function do_shortcode( $atts ) {
+    // pull some things from sitewide settings if not set by the shortcode
     $defaults = get_option($this->token);
+    $allowed_args = array(
+      'station_call_letters' => $defaults['station_call_letters'],
+      'ip_endpoint' => home_url('pbs_check_dma'),
+      'mismatch_dma_showdiv' => '#mismatch_dma_showdiv',
+      'match_dma_showdiv' => '#match_dma_showdiv',
+      'render_template' => false 
+    );
 
-    $args = array('station_call_letters' => $defaults['station_call_letters'], 'ip_endpoint' => home_url('pbs_check_dma'));
+    foreach ($allowed_args as $alrg=>$key) {
+      if ( !empty($defaults[$alrg])) {
+        $allowed_args[$alrg] = $defaults[$alrg];
+      }
+    }
+    $args = array();
+    if (is_array($atts)) {
+      $args = shortcode_atts($allowed_args, $atts, $this->token);
+    } else {
+      $args = $allowed_args;
+    }
 
     /* enqueue the supporting javascript, it should all be in the footer so its fine in a shortcode */
     $this->conditionally_enqueue_scripts();
@@ -81,7 +98,11 @@ class PBS_Check_DMA {
     $json_args = stripslashes(json_encode($args));
     $jsonblock = '<script language="javascript">var pbs_check_dma_args = ' . $json_args . ' </script>';
     $style = '<style>' . file_get_contents($this->assets_dir . '/css/pbs_check_dma.css') . '</style>';
-    $return = $jsonblock . $style;
+    $layout = '';
+    if ($args['render_template']) {
+      //$layout = '<div id="mismatch_dma_showdiv"></div><div id="match_dma_showdiv"></div>';
+    }
+    $return = $jsonblock . $style . $layout;
     return $return;
   }
 }

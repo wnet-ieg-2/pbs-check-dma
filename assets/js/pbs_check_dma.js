@@ -1,6 +1,9 @@
 jQuery(document).ready(function($) {
 
-  var args = {};
+  var args = {
+    mismatch_dma_showdiv : '#mismatch_dma_showdiv',
+    match_dma_showdiv : '#match_dma_showdiv',
+  };
 
   if (typeof pbs_check_dma_args !== "undefined") {
     args = pbs_check_dma_args;
@@ -109,6 +112,7 @@ jQuery(document).ready(function($) {
       var callsign = arr[i].$links[0].callsign;
       if ((arr[i].confidence == 100) && (callsign == station_call_letters)) {
         console.log('found my station');
+        $(args.match_dma_showdiv).show();
         // set station cookie and exit
         return;
       }
@@ -147,28 +151,36 @@ jQuery(document).ready(function($) {
         station_button_list += '<button id="' + callsign + '" class="stationItem' + activeclass + '" data-donate_url="' + membership_url + '" data-common_name="' + common_name + '" aria-pressed="' + ariapressed +'"><h3><strong class="commonName">' + common_name + '</strong><strong class="shortCommonName">' + short_common_name + '</strong></h3><span>' + mailing_city + ', ' + mailing_state + '</span></button>';
       }
     }
-    cboxOptions['height'] = 526;
+    cboxOptions['height'] = 567;
     $.colorbox(cboxOptions);
 
-    var confirm_wrapper_template = '<div id="pbs-stations-list" class="pbs-modal pbs-stations-list" role="dialog" aria-labeledby="enterZipCodeTitle" tabindex="0" data-pass-focus-on-shift-tab-to="pbs-close-popup"> <!-- modal window --> <!-- title --><div class="modalTitle"><h2 id="enterZipCodeTitle">Confirm Your Local Station</h2></div> <!-- content --><div class="modalContent" role="document"><div class="autoLocalizationContainer localizationStationList"><div class="autoLocalizationText"><p><span>To help you find your favorite shows and great local content, we\'ve selected a PBS station in your area.</span><span class="paragraph">Please confirm that <span class="regionalDefaultStation"></span><span class="regionalDefaultStationMobile"></span> is your preferred local station, or choose another station below.</span></p></div><div class="modalStationImage"></div></div><div class="autoLocalizationContainer localizationStationListNoStations none"><div class="autoLocalizationText"><p>There are no stations available for your selected zip code.</p></div></div> <section id="autoSelectStation" class="" style="-ms-overflow-y:auto;"><!-- DO NOT DELETE --> <div class="stationsList" id="autoStationsList"></div> </section> <div class="modalBottomContainer localizationStationList"><button id="moreStations" class="showStatesModal modal-button widthMedium">More Stations</button><button id="confirmStation" class="modalConfirmStation modal-button baseBlue widthMedium">Confirm Station</button></div><div id="noStations" class="modalBottomContainer localizationStationListNoStations none"><button id="backButton" class="zipBackButton modal-button baseBlue widthMedium">Back</button></div> </div><!-- end of content --><button id="pbs-close-popup" class="closeBtn" data-pass-focus-on-tab-to="pbs-stations-list" aria-label="Dismiss"> × </button></div>'; 
+    var confirm_wrapper_template = '<div id="pbs-stations-list" class="pbs-modal pbs-stations-list" role="dialog" aria-labeledby="enterZipCodeTitle" tabindex="0" data-pass-focus-on-shift-tab-to="pbs-close-popup"> <!-- modal window --> <!-- title --><div class="modalTitle"><h2 id="enterZipCodeTitle">Confirm Your Local Station</h2></div> <!-- content --><div class="modalContent" role="document"><div class="autoLocalizationContainer localizationStationList"><div class="autoLocalizationText"><p><span>To help you find your favorite shows and great local content, we\'ve selected a PBS station in your area.</span><span class="paragraph">Please confirm that <span class="regionalDefaultStation"></span><span class="regionalDefaultStationMobile"></span> is your preferred local station, or choose another station below.</span></p></div><div class="modalStationImage"></div></div><div class="autoLocalizationContainer localizationStationListNoStations none"><div class="autoLocalizationText"><p>There are no stations available for your selected zip code.</p></div></div> <section id="autoSelectStation" class="" style="-ms-overflow-y:auto;"><!-- DO NOT DELETE --> <div class="stationsList" id="autoStationsList"></div> </section> <div class="modalBottomContainer localizationStationList"><button id="moreStations" class="showStatesModal modal-button widthMedium">More Stations</button><button id="confirmStation" class="modalConfirmStation modal-button baseBlue widthMedium">Confirm Station</button></div><div id="noStations" class="modalBottomContainer localizationStationListNoStations none"><button id="backButton" class="zipBackButton modal-button baseBlue widthMedium">Back</button></div> <div class="pickAnyway"></div></div><!-- end of content --><button id="pbs-close-popup" class="closeBtn" data-pass-focus-on-tab-to="pbs-stations-list" aria-label="Dismiss"> × </button></div>'; 
     
     var output = confirm_wrapper_template;
     
     $('#cboxContent').html(output);
     $('#pbs-stations-list .regionalDefaultStation, #pbs-stations-list .regionalDefaultStationMobile').text(first_option_short_common_name);
     $('#pbs-stations-list .modalStationImage').html('<img src="//image.pbs.org/station-images/StationColorProfiles/color/' + first_option_callsign + '.png.resize.106x106.png" alt="' + first_option_short_common_name + '">');
+    $('#pbs-stations-list .pickAnyway').html('<button class="modal-button">My local station is THIRTEEN</button>');
     $('#autoStationsList').html(station_button_list);
     $('#moreStations').click(function(e) {
       e.preventDefault(); 
       $.colorbox.remove();
       renderStationZipSelector();
     });
+    $('#autoStationsList button.stationItem').click(function(e) {
+      e.preventDefault();
+      $.colorbox.remove();
+      console.log($(this).attr('data-donate_url'));
+      $(args.mismatch_dma_showdiv).show();
+      $('.regionalDefaultStation').text($(this).attr('data-common_name'));
+    });
 
   }
 
   function renderStationZipSelector() {
     var output = '<div id="pbs-find-stations" class="pbs-modal pbs-find-stations" role="dialog" tabindex="0" aria-labeledby="selectStationTitle" data-pass-focus-on-shift-tab-to="pbs-close-find-station"><!-- modal window --><!-- title --><div class="modalTitle"><h2 id="selectStationTitle">Find Your Local Station:</h2></div><!-- content --><div class="modalContent" role="document"><!-- enter zip code screen --><section id="enterZipCode"><div class="form"><div class="fieldset clearfix zipform"><input id="zipInput" pattern="[0-9]*" minlength="5" maxlength="5" name="zip" placeholder="ZIP Code" required="required" type="tel"><button id="searchByZip" class="modal-button baseBlue" data-atr="getByZip">Search by ZIP Code</button><p class="errorMsg none">Please enter a valid zip code</p></div><div class="fieldset clearfix regionform"><select name="" id="regionSelect"><option value="">Select State</option><option value="AL">Alabama</option><option value="AK">Alaska</option><option value="AS">American Samoa</option><option value="AZ">Arizona</option><option value="AR">Arkansas</option><option value="CA">California</option><option value="CO">Colorado</option><option value="CT">Connecticut</option><option value="DE">Delaware</option><option value="DC">District of Columbia</option><option value="FL">Florida</option><option value="GA">Georgia</option><option value="GU">Guam</option><option value="HI">Hawaii</option><option value="ID">Idaho</option><option value="IL">Illinois</option><option value="IN">Indiana</option><option value="IA">Iowa</option><option value="KS">Kansas</option><option value="KY">Kentucky</option><option value="LA">Louisiana</option><option value="ME">Maine</option><option value="MD">Maryland</option><option value="MA">Massachusetts</option><option value="MI">Michigan</option><option value="MN">Minnesota</option><option value="MS">Mississippi</option><option value="MO">Missouri</option><option value="MT">Montana</option><option value="NE">Nebraska</option><option value="NV">Nevada</option><option value="NH">New Hampshire</option><option value="NJ">New Jersey</option><option value="NM">New Mexico</option><option value="NY">New York</option><option value="NC">North Carolina</option><option value="ND">North Dakota</option><option value="OH">Ohio</option><option value="OK">Oklahoma</option><option value="OR">Oregon</option><option value="PA">Pennsylvania</option><option value="PR">Puerto Rico</option><option value="RI">Rhode Island</option><option value="SC">South Carolina</option><option value="SD">South Dakota</option><option value="TN">Tennessee</option><option value="TX">Texas</option><option value="UT">Utah</option><option value="VT">Vermont</option><option value="VI">Virgin Islands</option><option value="VA">Virginia</option><option value="WA">Washington</option><option value="WV">West Virginia</option><option value="WI">Wisconsin</option><option value="WY">Wyoming</option></select><button id="serchByRegion" class="modal-button baseBlue" data-atr="getByRegion">Search by State</button><p class="errorMsg none">Please select a region</p></div></div></section><button id="pbs-close-find-station" class="closeBtn" data-pass-focus-on-tab-to="pbs-find-stations" aria-label="Dismiss"> × </button></div><!-- end of content --></div>';
-    delete cboxOptions['height'];
+    cboxOptions['height'] = 300;
     $.colorbox(cboxOptions);
     $('#cboxContent').html(output);
     $('#searchByZip').click(function(e) {
@@ -209,6 +221,8 @@ jQuery(document).ready(function($) {
   });
  
   $(function() {
+    $(args.match_dma_showdiv).hide();
+    $(args.mismatch_dma_showdiv).hide();
     getClientIP();
   });
   
