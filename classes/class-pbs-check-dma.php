@@ -74,10 +74,11 @@ class PBS_Check_DMA {
     $defaults = get_option($this->token);
     $allowed_args = array(
       'station_call_letters' => $defaults['station_call_letters'],
+      'station_common_name' => $defaults['station_common_name'],
       'ip_endpoint' => home_url('pbs_check_dma'),
       'mismatch_dma_showdiv' => '#mismatch_dma_showdiv',
       'match_dma_showdiv' => '#match_dma_showdiv',
-      'render_template' => false 
+      'render_template' => 'false'
     );
 
     foreach ($allowed_args as $alrg=>$key) {
@@ -99,8 +100,8 @@ class PBS_Check_DMA {
     $jsonblock = '<script language="javascript">var pbs_check_dma_args = ' . $json_args . ' </script>';
     $style = '<style>' . file_get_contents($this->assets_dir . '/css/pbs_check_dma.css') . '</style>';
     $layout = '';
-    if ($args['render_template']) {
-      //$layout = '<div id="mismatch_dma_showdiv"></div><div id="match_dma_showdiv"></div>';
+    if ($args['render_template'] === 'true') {
+      $layout = '<div id="mismatch_dma_showdiv"></div><div id="match_dma_showdiv"></div>';
     }
     $return = $jsonblock . $style . $layout;
     return $return;
