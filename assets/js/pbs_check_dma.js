@@ -247,6 +247,7 @@ jQuery(document).ready(function($) {
 
   function unSetStation() {
     $(args.mismatch_dma_showdiv).hide();
+    $(args.match_dma_showdiv).hide();
     console.log('unsetting station cookie');
     document.cookie = 'pbs_station_json=false; expires=-1; path=/';
     checkForStation();    
@@ -269,6 +270,10 @@ jQuery(document).ready(function($) {
   $(function() {
     $(args.match_dma_showdiv).hide();
     $(args.mismatch_dma_showdiv).hide();
+    $('.unSetStation').click(function(e) {
+      e.preventDefault();
+      unSetStation();
+    });
     checkForStation();
   });
   
