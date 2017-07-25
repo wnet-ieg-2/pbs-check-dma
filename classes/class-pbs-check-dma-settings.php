@@ -45,6 +45,8 @@ class PBS_Check_DMA_Settings {
 
     // you can define EVERYTHING to create, display, and process each settings field as one line per setting below.  And all settings defined in this function are stored as a single serialized object.
     add_settings_field( 'station_call_letters', 'Station Call Letters', array( $this, 'settings_field'), $this->token, 'generalsettings', array('setting' => $this->token, 'field' => 'station_call_letters', 'class' => 'small-text', 'label' => 'Broadcast call letters, as used by PBS and Nielsen, for the "flagship" station you want to check the DMA for.', 'default' => 'WNET') );
+
+    add_settings_field( 'station_common_name', 'Station Common Name', array( $this, 'settings_field'), $this->token, 'generalsettings', array('setting' => $this->token, 'field' => 'station_common_name', 'class' => 'regular-text', 'label' => 'Common name for the station, appropriate to show up in buttons and other text replacement situations, for the "flagship" station you want to check the DMA for.', 'default' => 'THIRTEEN') );
 	
 	}
 
