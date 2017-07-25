@@ -17,6 +17,35 @@ jQuery(document).ready(function($) {
       scrolling: false 
     }
 
+  function checkForStation() {
+    var station_cookie = readCookie('pbs_station_json');
+    if(station_cookie_obj = JSON.parse(station_cookie)) {
+      if (station_cookie_obj.call_letters == args.station_call_letters) {
+        $(args.match_dma_showdiv).show(); 
+      } else {
+        $(args.mismatch_dma_showdiv).show();
+        $('.regionalDefaultStation').text(station_cookie_obj.common_name);
+        $('.regionalStationDonateLink').html('<a href="' + station_cookie_obj.donate_url + '">become a member of ' + station_cookie_obj.common_name + '</a>');
+        $('.unSetStation').click(function(e) {
+          e.preventDefault();
+          unSetStation();
+        });
+      }
+    } else {
+      getClientIP();
+    }
+  }
+
+  function readCookie(name) {
+    var nameEQ = encodeURIComponent(name) + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+      var c = ca[i];
+      while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+      }
+    return null;
+  }
 
   function getClientIP() {
     var ip_url = args.ip_endpoint;
@@ -97,20 +126,20 @@ jQuery(document).ready(function($) {
       cache: true,
       success: function(response) {
         if (typeof response.$items[0] !== "undefined") {
-          checkForStation(response.$items);
+          checkForStationMatch(response.$items);
         }
       }             
     });
   }
 
-  function checkForStation(arr) {
+  function checkForStationMatch(arr) {
     var station_call_letters = args.station_call_letters;
     for (var i = 0, len=arr.length; i < len; i++) {
       var callsign = arr[i].$links[0].callsign;
       if ((arr[i].confidence == 100) && (callsign == station_call_letters)) {
-        console.log('found my station');
         $(args.match_dma_showdiv).show();
-        // set station cookie and exit
+        setStationCookie(station_call_letters);
+        console.log(JSON.stringify(arr[i]));
         return;
       }
     }
@@ -158,7 +187,7 @@ jQuery(document).ready(function($) {
     $('#cboxContent').html(output);
     $('#pbs-stations-list .regionalDefaultStation, #pbs-stations-list .regionalDefaultStationMobile').text(first_option_short_common_name);
     $('#pbs-stations-list .modalStationImage').html('<img src="//image.pbs.org/station-images/StationColorProfiles/color/' + first_option_callsign + '.png.resize.106x106.png" alt="' + first_option_short_common_name + '">');
-    $('#pbs-stations-list .pickAnyway').html('<button id="' + args.station_call_letters + '" class="modal-button">My local station is ' + args.station_common_name + '</button>');
+    $('#pbs-stations-list .pickAnyway').html('<button class="modal-button">My local station is ' + args.station_common_name + '</button>');
     $('#autoStationsList').html(station_button_list);
     $('#moreStations').click(function(e) {
       e.preventDefault(); 
@@ -168,10 +197,16 @@ jQuery(document).ready(function($) {
     $('#autoStationsList button.stationItem').click(function(e) {
       e.preventDefault();
       $.colorbox.remove();
-      console.log($(this).attr('data-donate_url'));
-      $(args.mismatch_dma_showdiv).show();
-      $('.regionalDefaultStation').text($(this).attr('data-common_name'));
+      setStationCookie($(this).attr('id'), $(this).attr('data-common_name'), $(this).attr('data-donate_url') );
+      checkForStation();
     });
+    $('#pbs-stations-list .pickAnyway button').click(function(e) {
+      e.preventDefault();
+      $.colorbox.remove();
+      setStationCookie(args.station_call_letters);
+      $(args.match_dma_showdiv).show();
+    });
+
 
   }
 
@@ -200,9 +235,23 @@ jQuery(document).ready(function($) {
         console.log('invalid state');
       }
     });
-
-
   } 
+
+  function setStationCookie(call_letters, common_name, donate_url) {
+    console.log('will set cookie for ' + call_letters);
+    var a = new Date();
+    a = new Date(a.getTime() +1000*60*60*24*365);
+    var station_ary = {'call_letters' : call_letters, 'common_name' : common_name, 'donate_url' : donate_url};
+    document.cookie = 'pbs_station_json=' + JSON.stringify(station_ary) +'; expires='+a.toUTCString() + "; path=/";
+  }
+
+  function unSetStation() {
+    $(args.mismatch_dma_showdiv).hide();
+    console.log('unsetting station cookie');
+    document.cookie = 'pbs_station_json=false; expires=-1; path=/';
+    checkForStation();    
+  }
+
 
   function cbresize() {
     $.colorbox.resize(cboxOptions);
@@ -220,7 +269,7 @@ jQuery(document).ready(function($) {
   $(function() {
     $(args.match_dma_showdiv).hide();
     $(args.mismatch_dma_showdiv).hide();
-    getClientIP();
+    checkForStation();
   });
   
 
