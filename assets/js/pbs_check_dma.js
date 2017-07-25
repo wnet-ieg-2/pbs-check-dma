@@ -1,9 +1,6 @@
 jQuery(document).ready(function($) {
 
-  var args = {
-    mismatch_dma_showdiv : '#mismatch_dma_showdiv',
-    match_dma_showdiv : '#match_dma_showdiv',
-  };
+  var args = {};
 
   if (typeof pbs_check_dma_args !== "undefined") {
     args = pbs_check_dma_args;
@@ -161,7 +158,7 @@ jQuery(document).ready(function($) {
     $('#cboxContent').html(output);
     $('#pbs-stations-list .regionalDefaultStation, #pbs-stations-list .regionalDefaultStationMobile').text(first_option_short_common_name);
     $('#pbs-stations-list .modalStationImage').html('<img src="//image.pbs.org/station-images/StationColorProfiles/color/' + first_option_callsign + '.png.resize.106x106.png" alt="' + first_option_short_common_name + '">');
-    $('#pbs-stations-list .pickAnyway').html('<button class="modal-button">My local station is THIRTEEN</button>');
+    $('#pbs-stations-list .pickAnyway').html('<button id="' + args.station_call_letters + '" class="modal-button">My local station is ' + args.station_common_name + '</button>');
     $('#autoStationsList').html(station_button_list);
     $('#moreStations').click(function(e) {
       e.preventDefault(); 
