@@ -769,7 +769,8 @@ div.pbs-modal.pbs-insider .insiderSpiner .spinImage {
 .pbs-find-stations #selectStation .stationsList .stationItem h3 {
  font-size:1em;
  font-weight:bold;
- float:left
+ float:left;
+ margin:inherit
 }
 .pbs-find-stations #selectStation .stationsList .stationItem span {
  font-size:0.875em;
@@ -929,7 +930,8 @@ body .pbs-stations-list #autoSelectStation .stationsList .stationItem.active {
 body .pbs-stations-list #autoSelectStation .stationsList .stationItem h3 {
  font-size:1em;
  font-weight:bold;
- float:left
+ float:left;
+ margin:inherit
 }
 body .pbs-stations-list #autoSelectStation .stationsList .stationItem h3 .smallFlagship {
  display:block
