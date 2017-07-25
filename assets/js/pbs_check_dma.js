@@ -18,6 +18,12 @@ jQuery(document).ready(function($) {
     }
 
   function checkForStation() {
+    $(args.match_dma_showdiv).hide();
+    $(args.mismatch_dma_showdiv).hide();
+    $('.unSetStation').click(function(e) {
+      e.preventDefault();
+      unSetStation();
+    });
     var station_cookie = readCookie('pbs_station_json');
     if(station_cookie_obj = JSON.parse(station_cookie)) {
       if (station_cookie_obj.call_letters == args.station_call_letters) {
@@ -26,10 +32,6 @@ jQuery(document).ready(function($) {
         $(args.mismatch_dma_showdiv).show();
         $('.regionalDefaultStation').text(station_cookie_obj.common_name);
         $('.regionalStationDonateLink').html('<a href="' + station_cookie_obj.donate_url + '">become a member of ' + station_cookie_obj.common_name + '</a>');
-        $('.unSetStation').click(function(e) {
-          e.preventDefault();
-          unSetStation();
-        });
       }
     } else {
       getClientIP();
@@ -268,12 +270,6 @@ jQuery(document).ready(function($) {
   });
  
   $(function() {
-    $(args.match_dma_showdiv).hide();
-    $(args.mismatch_dma_showdiv).hide();
-    $('.unSetStation').click(function(e) {
-      e.preventDefault();
-      unSetStation();
-    });
     checkForStation();
   });
   
