@@ -39,7 +39,7 @@ class PBS_Check_DMA {
     if (! wp_script_is( 'colorbox', 'registered' ) ) {
       wp_register_script( 'colorbox', $this->assets_url . 'js/jquery.colorbox-min.js', array('jquery'), '1.6.3', true );
       // base colorbox styling 
-      wp_enqueue_style( 'colorbox_css', $this->assets_url . 'css/colorbox.css' );
+      wp_enqueue_style( 'colorbox', $this->assets_url . 'css/colorbox.css' );
     }
     wp_enqueue_script( 'colorbox' );
   }
