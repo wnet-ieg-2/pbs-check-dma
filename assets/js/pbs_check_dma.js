@@ -1,53 +1,30 @@
 jQuery(document).ready(function($) {
 
-  var args = {};
+  function DMARestrictedPlayer(passedDiv) {
+    if (typeof(passedDiv) !== 'undefined' && passedDiv) {playerdiv = $(passedDiv);}
+    else {$player = $('.dmarestrictedplayer');}
+    var active = 0;
+    var videoID = playerdiv.data('media');
 
-  if (typeof pbs_check_dma_args !== "undefined") {
-    args = pbs_check_dma_args;
-  }
+    var dma_endpoint = "/pbs_check_dma/";
 
-  var cboxOptions = {
-      iframe: true,
-      closeButton: false,
-      overlayClose: false,
-      maxWidth: "1164",
-      width: "95%",
-      maxHeight: "95%",
-      height: "700",
-      scrolling: false,
-      href: '/wp-content/common/ipad/explore-dma-register.php' 
-    }
-
-  function renderDMAbox() {
-    $.colorbox(cboxOptions);
-    $('button#dismissEmail').click(function(e) {
-      console.log('fired');
-      e.preventDefault();
-      $.colorbox.remove();
+    $.ajax({
+      url: dma_endpoint,
+      data: {media_id:videoID},
+      type: 'POST',
+      dataType: 'json',
+      success: function(response) {
+        playerdiv.html(response);
+      }
     });
   }
 
-  function cbresize() {
-    $.colorbox.resize(cboxOptions);
-  }
-
-
-
-  $(window).resize(function(){
-    $.colorbox.resize({
-      width: window.innerWidth > parseInt(cboxOptions.maxWidth) ? cboxOptions.maxWidth : cboxOptions.width,
-      height: window.innerHeight > parseInt(cboxOptions.maxHeight) ? cboxOptions.maxHeight : cboxOptions.height
+  if ($(".dmarestrictedplayer[data-media]")[0]){
+    $( ".dmarestrictedplayer" ).each(function( index ) {
+        DMARestrictedPlayer(this);
     });
-  });
- 
-  $(function() {
-    renderDMAbox();
-  });
+  }
 
 
 });
-
-function closeColorbox() {
-  jQuery.colorbox.close();
-}
 

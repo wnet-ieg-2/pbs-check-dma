@@ -12,16 +12,15 @@ class PBS_Check_DMA {
   private $token;
   public  $version;
 
-	public function __construct($file) {
-		$this->dir = dirname( $file );
-		$this->file = $file;
+	public function __construct() {
+    $this->dir = realpath( __DIR__ . '/..' );
 		$this->assets_dir = trailingslashit( $this->dir ) . 'assets';
-		$this->assets_url = esc_url( trailingslashit( plugins_url( '/assets/', $file ) ) );
+		$this->assets_url = trailingslashit(plugin_dir_url( __DIR__ ) ) . 'assets';
     $this->token = 'pbs_check_dma';
-    $this->version = '0.1';
+    $this->version = '0.2';
 
 		// Load public-facing style sheet and JavaScript.
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+		//add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
     // make calls to pbs premium content use our custom AJAX templates
     add_action( 'init', array($this, 'setup_rewrite_rules') );
@@ -33,26 +32,17 @@ class PBS_Check_DMA {
 
 	}
 
-  public function enqueue_scripts() {
-    /* only stuff we have to enqueue in header */
-    // colorbox is a common script so lets avoid conflicts and use whatever version is registered if one is already
-    if (! wp_script_is( 'colorbox', 'registered' ) ) {
-      wp_register_script( 'colorbox', $this->assets_url . 'js/jquery.colorbox-min.js', array('jquery'), '1.6.3', true );
-      // base colorbox styling 
-      wp_enqueue_style( 'colorbox', $this->assets_url . 'css/colorbox.css' );
-    }
-    wp_enqueue_script( 'colorbox' );
-  }
 
-  public function conditionally_enqueue_scripts() {
-    wp_register_script( 'pbs_check_dma_js' , $this->assets_url . 'js/pbs_check_dma.js', array('colorbox'), $this->version, true );
+  public function enqueue_scripts() {
+    wp_register_script( 'pbs_check_dma_js' , $this->assets_url . '/js/pbs_check_dma.js', array('jquery'), $this->version, true );
     wp_enqueue_script( 'pbs_check_dma_js' );
+    wp_enqueue_style('pbs_check_dma_css', $this->assets_url . '/css/pbs_check_dma.css', null, $this->version);
   }
 
   // these next functions setup the custom endpoints
 
   public function setup_rewrite_rules() {
-    add_rewrite_rule( 'pbs_check_dma/?.*$', 'index.php?pbs_check_dma=true', 'top');
+    add_rewrite_rule( 'pbs_check_dma/?.*$', 'index.php?pbs_check_dma=1', 'top');
   }
 
   public function register_query_vars( $vars ) {
@@ -61,13 +51,81 @@ class PBS_Check_DMA {
   }
 
   public function use_custom_template($template) {
-    if ( get_query_var('pbs_check_dma')==true) {
+    if ( get_query_var('pbs_check_dma')==true ) {
       $template = trailingslashit($this->dir) . 'templates/endpoint-template.php' ;
     }
     return $template;
   }
 
+  public function get_location_from_ip($client_ip) {
+    $zip_url = 'https://services.pbs.org/zipcodes/ip/';
+    $combined_url = $zip_url . $client_ip . '.json';
+    $response = wp_remote_get($combined_url, array());
+    if ( is_array( $response ) ) {
+      $header = $response['headers']; // array of http header lines
+      $body = $response['body']; // use the content
+    } else {
+      return array('errors' => $response);
+    }
+    if ($body) {
+      $parsed = json_decode($body, TRUE);
+      $item = $parsed['$items'][0];
+      $zipcode = (string) $item['zipcode'];
+      $state = '';
+      $county = '';
+      foreach ($item['$links'] as $link) {
+        if ($link['$relationship'] == "related") {
+          $state = !empty($link['$items'][0]['$links'][0]['state']) ? $link['$items'][0]['$links'][0]['state'] : '';
+          $county = !empty($link['$items'][0]['county_name']) ? $link['$items'][0]['county_name'] : '';
+          break;
+        }
+      }
+      $return = array('zipcode' => $zipcode, 'state' => $state, 'county' => $county);
+      return $return;
+    }
+  }
 
+  public function get_remote_ip_address() {
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        return $_SERVER['HTTP_CLIENT_IP'];
+
+    } else if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        return $_SERVER['HTTP_X_FORWARDED_FOR'];
+    }
+    return $_SERVER['REMOTE_ADDR'];
+  }
+
+  public function compare_zip_to_local_list($zip) {
+    $filename = trailingslashit($this->assets_dir) . "zipary.php";
+    require($filename);
+    return in_array($zip, $zipary);
+  }
+
+  public function visitor_is_in_dma() {
+    $ip = $this->get_remote_ip_address();
+    $location = $this->get_location_from_ip($ip);
+    $zipcode = $location['zipcode'];
+    return $this->compare_zip_to_local_list($zipcode);
+  }
+
+  public function build_dma_restricted_player($video) {
+    $imgDir = get_bloginfo('template_directory');
+    $m = json_decode($video->metadata);
+
+    // video poster image.
+    if (empty($m->mezzanine)) {
+      $large_thumb = $imgDir . "/libs/images/default.png";
+    } else {
+      if (function_exists( 'wnet_video_cove_thumb')) {
+        $large_thumb = wnet_video_cove_thumb($m->mezzanine, 1200, 675);
+      } else {
+        $large_thumb = $m->mezzanine;
+      }
+    }
+    $player = '<div class="dmarestrictedplayer" data-media="'.$video->tp_media_object_id.'"><img src="'.$large_thumb.'" /></div>';
+    $this->enqueue_scripts();
+    return $player;
+  }
 
   public function do_shortcode( $atts ) {
     // pull some things from sitewide settings if not set by the shortcode

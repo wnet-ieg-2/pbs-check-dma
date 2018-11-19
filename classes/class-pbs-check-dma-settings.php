@@ -26,6 +26,9 @@ class PBS_Check_DMA_Settings {
 		// Add settings link to plugins page
 		add_filter( 'plugin_action_links_' . plugin_basename( $this->file ) , array( $this , 'add_settings_link' ) );
 
+    // handle meta boxes to save/update custom images on program pages
+    add_action( 'add_meta_boxes', array( $this, 'meta_box_setup' ), 20 );
+    add_action( 'save_post', array( $this, 'meta_box_save' ), 1 );
 	}
 	
 	public function add_menu_item() {
@@ -82,4 +85,48 @@ class PBS_Check_DMA_Settings {
   TK
     <?php
   }
+
+  // This section is for meta boxes on the individual program pages
+
+  public function meta_box_setup( $post_type ) {
+    if ( $post_type == 'programs' ) {
+      add_meta_box( 'pbs_check_dma', 'DMA Restriction', array( $this, 'metabox_content' ), 'programs', 'side' );
+    }
+  }
+
+  public function metabox_content() {
+    global $post_id;
+
+    $dma_restrict = get_post_meta( $post_id, 'dma_restricted_video', TRUE );
+
+    $restricted = !empty($dma_restrict) ? $dma_restrict : false;
+    $checked = $restricted ? 'checked' : '';
+
+    $html = '<input type="hidden" name="dma_restricted_nonce" id="dma_restricted_nonce" value="' . wp_create_nonce( 'dma_restricted_nonce' ) . '" />';
+    $html .= '<input type="checkbox" name="dma_restricted_video" id="dma_restricted_video" value="true" ' . $checked . ' />';
+    $html .= '<label for="dma_restricted_video">DMA-restrict videos</label><div class="description"><i>Checking this box will force all videos on this program page to go through the DMA restriction setup.</i></div>';
+    echo $html;
+  }
+
+  public function meta_box_save() {
+    global $post_id;
+    // Verify nonce
+    if ( ! wp_verify_nonce( $_POST[ 'dma_restricted_nonce'], 'dma_restricted_nonce' ) ) {
+      return $post_id;
+    }
+
+    // Verify user permissions
+    if ( ! current_user_can( 'edit_post', $post_id ) ) {
+      return $post_id;
+    }
+    $value = isset( $_POST['dma_restricted_video']) ? $_POST['dma_restricted_video'] : false;
+    if ($value) {
+      update_post_meta( $post_id , 'dma_restricted_video', $value );
+    } else {
+      delete_post_meta( $post_id , 'dma_restricted_video');
+    }
+  }
+
+
+
 }

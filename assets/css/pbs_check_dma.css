@@ -1,3 +1,9 @@
+.dmarestrictedplayer .sorry {
+  padding: 1em;
+  opacity: 70%;
+}
+
+
 body .pbs-check-dma-modal {
   font: normal 100% 'Montserrat';
   background: #fff;
