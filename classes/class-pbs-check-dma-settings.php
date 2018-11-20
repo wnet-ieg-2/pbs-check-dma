@@ -50,21 +50,74 @@ class PBS_Check_DMA_Settings {
     add_settings_field( 'station_call_letters', 'Station Call Letters', array( $this, 'settings_field'), $this->token, 'generalsettings', array('setting' => $this->token, 'field' => 'station_call_letters', 'class' => 'small-text', 'label' => 'Broadcast call letters, as used by PBS and Nielsen, for the "flagship" station you want to check the DMA for.', 'default' => 'WNET') );
 
     add_settings_field( 'station_common_name', 'Station Common Name', array( $this, 'settings_field'), $this->token, 'generalsettings', array('setting' => $this->token, 'field' => 'station_common_name', 'class' => 'regular-text', 'label' => 'Common name for the station, appropriate to show up in buttons and other text replacement situations, for the "flagship" station you want to check the DMA for.', 'default' => 'THIRTEEN') );
+ 
+    add_settings_field( 'state_counties_array', 'Allowed Counties by State', array($this, 'settings_field'), $this->token, 'generalsettings', array('setting' => $this->token, 'field' => 'state_counties_array', 'type' => 'array', 'options' => array('count_source' => 'state_count', 'state' => array('label' => 'State', 'class' => 'small-text'), 'counties' => array('label' => 'Counties', 'class' => 'regular-text')),  'label' => 'Configure below which the list of counties, by state, that match our DMA.  Counties should be a comma-separated list of county names (eg Kings, Bronx, Queens), states should be two-char abrevs eg NY', 'class' => 'medium-text') );
+    add_settings_field( 'state_count', 'State Count', array($this, 'settings_field'), $this->token, 'generalsettings', array('setting' => $this->token, 'field' => 'state_count', 'type' => 'text', 'default' => 4,  'label' => 'How many states appear above', 'class' => 'small-text') );
 	
 	}
 
 	public function settings_section_callback() { echo ' '; }
 
 	public function settings_field( $args ) {
-    // This is the default processor that will handle standard text input fields.  Because it accepts a class, it can be styled or even have jQuery things (like a calendar picker) integrated in it.  Pass in a 'default' argument only if you want a non-empty default value.
+    // This is the default processor that will handle most input fields.  Because it accepts a class, it can be styled or even have jQuery things (like a calendar picker) integrated in it.  Pass in a 'default' argument only if you want a non-empty default value.
     $settingname = esc_attr( $args['setting'] );
     $setting = get_option($settingname);
     $field = esc_attr( $args['field'] );
     $label = esc_attr( $args['label'] );
     $class = esc_attr( $args['class'] );
+    $type = ($args['type'] ? esc_attr( $args['type'] ) : 'text' );
+    $options = (is_array($args['options']) ? $args['options'] : array('true', 'false') );
     $default = ($args['default'] ? esc_attr( $args['default'] ) : '' );
-    $value = (($setting[$field] && strlen(trim($setting[$field]))) ? $setting[$field] : $default);
-    echo '<input type="text" name="' . $settingname . '[' . $field . ']" id="' . $settingname . '[' . $field . ']" class="' . $class . '" value="' . $value . '" /><p class="description">' . $label . '</p>';
+    switch ($type) {
+      case "checkbox":
+        // dont set a default for checkboxes
+        $value = $setting[$field];
+        $values = ( is_array($value) ? $values = $value : array($value) );
+        foreach($options as $option) {
+          // each option can be an array but doesn't have to be
+          if (! is_array($option)) {
+            $option_label = $option;
+            $option_value = $option;
+          } else {
+            $option_label = (isset($option[label]) ? esc_attr($option[label]) : $option[0]);
+            $option_value = (isset($option[value]) ? esc_attr($option[value]) : $option[0]);
+          }
+          $checked = in_array($option_value, $values) ? 'checked="checked"' : '';
+          echo '<span class="' . $class . '"><input type="checkbox" name="' . $settingname . '[' . $field . ']" id="' . $settingname . '[' . $field . ']" value="' . $option_value . '" ' . $checked . ' />&nbsp;' . $option_label . ' </span> &nbsp; ';
+        }
+        echo '<label for="' . $field . '"><p class="description">' . $label . '</p></label>';
+        break;
+      case "array":
+        // array is a set of key/value pairs, all as text boxes
+        $value = $setting[$field];
+        $values = ( is_array($value) ? $values = $value : array($value) );
+        $count = !empty($options['count']) ? $options['count'] : 1;
+        $count_source = !empty($options['count_source']) ? $options['count_source'] : false;
+        $limit = !empty($setting[$count_source]) ? $setting[$count_source] : $count;
+        $output = '';
+        $output .= '<label for="' . $field . '"><p class="description">' . $label . '</p></label>';
+        for ($i = 0; $i < $limit; $i++) {
+          $output .= "<div>";
+          if ($limit > 1) { $output .= "Item $i : ";}
+          foreach($options as $optionkey => $option) {
+            if ($optionkey == 'count_source' || $optionkey == 'count') {
+              continue;
+            }
+            $option_label = (isset($option['label']) ? esc_attr($option['label']) : $option[0]);
+            $option_value = (isset($option['value']) ? esc_attr($option['value']) : $option[0]);
+            $option_class = (isset($option['class']) ? esc_attr($option['class']) : $class);
+            $output .= '<span>' . $option_label . ' <input type="text" class= "' . $option_class . '" name="' . $settingname . '[' . $field . "][$i][" . $optionkey . ']" id="' . $settingname . '[' . $field . "][$i][" . $optionkey . ']" value="' . $values[$i][$optionkey] . '" /></span>&nbsp;';
+          }
+          $output .= "</div>";
+        }
+        echo $output;
+        break;
+
+      default:
+        // any case other than selects, radios, checkboxes, or textareas formats like a text input
+        $value = (($setting[$field] && strlen(trim($setting[$field]))) ? $setting[$field] : $default);
+        echo '<input type="' . $type . '" name="' . $settingname . '[' . $field . ']" id="' . $settingname . '[' . $field . ']" class="' . $class . '" value="' . $value . '" /><p class="description">' . $label . '</p>';
+    }
 	}
 
 	public function settings_page() {
