@@ -105,7 +105,8 @@ class PBS_Check_DMA {
     $ip = $this->get_remote_ip_address();
     $location = $this->get_location_from_ip($ip);
     $zipcode = $location['zipcode'];
-    return $this->compare_zip_to_local_list($zipcode);
+    $in_dma = $this->compare_zip_to_local_list($zipcode);
+    return array($in_dma, "location" => $location);
   }
 
   public function build_dma_restricted_player($video) {
