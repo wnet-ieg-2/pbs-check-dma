@@ -101,11 +101,24 @@ class PBS_Check_DMA {
     return in_array($zip, $zipary);
   }
 
+  public function compare_county_to_local_list($location) {
+    $filename = trailingslashit($this->assets_dir) . "counties.php";
+    require($filename);
+    // $counties are an array in the above file
+    $state = !empty($location['state']) ? $location['state'] : '';
+    $county = !empty($location['county']) ? $location['county'] : ''; 
+    if (empty($location['state']) || !isset($counties[$state])) {
+      return false;
+    }
+    $countylist = $counties[$state];
+    return in_array(strtolower($county), array_map('strtolower', $countylist));
+  }
+
   public function visitor_is_in_dma() {
     $ip = $this->get_remote_ip_address();
     $location = $this->get_location_from_ip($ip);
-    $zipcode = $location['zipcode'];
-    $in_dma = $this->compare_zip_to_local_list($zipcode);
+    $in_dma = $this->compare_county_to_local_list($location);
+    //$in_dma = $this->compare_zip_to_local_list($zipcode);
     return array($in_dma, "location" => $location);
   }
 
