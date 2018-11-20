@@ -101,23 +101,47 @@ class PBS_Check_DMA {
     return in_array($zip, $zipary);
   }
 
-  public function compare_county_to_local_list($location) {
-    $filename = trailingslashit($this->assets_dir) . "counties.php";
-    require($filename);
-    // $counties are an array in the above file
-    $state = !empty($location['state']) ? $location['state'] : '';
-    $county = !empty($location['county']) ? $location['county'] : ''; 
-    if (empty($location['state']) || !isset($counties[$state])) {
+  public function format_counties_setting_for_use() {
+    $defaults = get_option($this->token);
+    if (empty($defaults["state_counties_array"])) {
       return false;
     }
-    $countylist = $counties[$state];
-    return in_array(strtolower($county), array_map('strtolower', $countylist));
+    $raw_counties = $defaults["state_counties_array"];
+    $returnary = array();
+    foreach ($raw_counties as $stateary) {
+      $thisstate = $stateary['state'];
+      $thesecounties = $stateary['counties'];
+      $countylist = array_map('trim', explode(",", $thesecounties));
+      $returnary[$thisstate] = $countylist; 
+    }
+    return $returnary; 
+  }
+
+
+  public function compare_county_to_allowed_list($location) {
+    $state = !empty($location['state']) ? $location['state'] : '';
+    $county = !empty($location['county']) ? $location['county'] : '';
+    if (empty($location['state']) || empty($location['state'])) {
+      return false;
+    }
+    $defaults = get_option($this->token);
+    $counties = $this->format_counties_setting_for_use();
+    if (!$counties) {
+      $filename = trailingslashit($this->assets_dir) . "counties.php";
+      require($filename);
+      // $counties are an array in the above file
+    }
+    if (!isset($counties[$state])) {
+      return false;
+    }
+    $these_counties = $counties[$state];
+    return in_array(strtolower($county), array_map('strtolower', $these_counties));
   }
 
   public function visitor_is_in_dma() {
     $ip = $this->get_remote_ip_address();
     $location = $this->get_location_from_ip($ip);
-    $in_dma = $this->compare_county_to_local_list($location);
+    $in_dma = $this->compare_county_to_allowed_list($location);
     //$in_dma = $this->compare_zip_to_local_list($zipcode);
     return array($in_dma, "location" => $location);
   }
