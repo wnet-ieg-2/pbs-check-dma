@@ -26,7 +26,7 @@ if (empty($_POST['media_id'])) {
     if ($location_string) {
       $location_string .= "; ";
     }
-    $location_string .= "$key : $var";
+    $location_string .= "$key: $var";
   }
   $location_string = !empty($location_string) ? $location_string : "a location that we are unable to determine";
   if ($apicheck[0]) {
