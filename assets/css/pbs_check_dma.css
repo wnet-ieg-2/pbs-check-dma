@@ -91,7 +91,7 @@ body .pbs-check-dma-modal .responseArea p span {
 }
 
 @media screen and ( max-width: 480px ) {
-    .video-wrap.dma-fail .sorry h3 {font-size: .9em;}
+    .video-wrap.dma-fail .sorry h3 {font-size: .8em;}
     .video-wrap.dma-fail .sorry p {font-size: .75em; line-height: 1em;}
 }
 @media screen and ( min-width: 481px ) and ( max-width: 665px ) {
