@@ -33,7 +33,19 @@ if (empty($_POST['media_id'])) {
     $media_id = $_POST['media_id'];
     $return = "<div class='video-wrap'><!-- DUE TO CONTRACTUAL OBLIGATIONS TO THE PRODUCERS, CAST, AND CREW OF THE PERFORMANCE RECORDED IN THE VIDEO BELOW, IT IS PROHIBITED TO PLAY THE VIDEO BELOW ON DEVICES THAT ARE NOT PHYSICALLY LOCATED WITHIN THE WNET/THIRTEEN BROADCAST AREA. THIS AREA IS COMPRISED OF THE FOLLOWING COUNTIES: $allowed_counties_string. PLEASE RESPECT THESE RIGHTS. Your device appears to be located in $location_string --><iframe src='//player.pbs.org/widget/partnerplayer/$media_id/?chapterbar=false' frameborder='0' marginwidth='0' marginheight='0' scrolling='no' webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe></div>";
   } else {
-    $return = "<div class='video-wrap'><div class='sorry'><h3>Sorry, this content is only available to viewers within our broadcast area*.</h3><p>Check your local PBS listings to find out where you can watch.</p><p>*Our broadcast area contains the following counties:  $allowed_counties_string.</p><p>Your device appears to be located in $location_string. If this is not correct, it may be due to VPN software on your device, or mis-reporting of your location by your network or cable provider.</p></div></div>";
+      
+      
+        if (function_exists('pbs_video_utils_get_video') && !empty($_POST['media_id'])) {
+            $video = pbs_video_utils_get_video($_POST['media_id']); 
+            if (!empty($video[0]['metadata'])) {
+                $m = json_decode($video[0]['metadata']);
+                if (!empty($m->mezzanine)) {$thumbnail = $m->mezzanine . '?crop=1200x675&format=jpg';}
+                else {$thumbnail = '';}
+            }
+        }
+      
+      
+    $return = "<div class='video-wrap dma-fail'><img src='$thumbnail'><div class='sorry'><div class='sorry-txt'><h3>Sorry, this content is only available to viewers within our broadcast area*.</h3><p>Check your <a href='https://www.pbs.org/tv_schedules/' target='_blank'>local PBS listings</a> to find out where you can watch.</p><p>*Our broadcast area contains the following counties:  $allowed_counties_string.</p><p>Your device appears to be located in $location_string. If this is not correct, it may be due to VPN software on your device, or mis-reporting of your location by your network or cable provider.</p></div></div></div>";
   }
 }
 
