@@ -69,8 +69,11 @@ class PBS_Check_DMA {
     }
     if ($body) {
       $parsed = json_decode($body, TRUE);
-      $item = $parsed['$items'][0];
-      $zipcode = (string) $item['zipcode'];
+      $item = !empty($parsed['$items'][0]) ? $parsed['$items'][0] : false;
+      if (!$item) {
+        return array('errors' => $response);
+      }
+      $zipcode = !empty($item['zipcode']) ? (string) $item['zipcode'] : '';
       $state = '';
       $county = '';
       if (empty($item['$links']) || !is_array($item['$links'])) {
