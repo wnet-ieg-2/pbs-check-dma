@@ -23,6 +23,9 @@ if (empty($_POST['media_id'])) {
   $apicheck = $api->visitor_is_in_dma();
   $location_string = "";
   foreach ($apicheck['location'] as $key => $var) {
+    if ($key == "errors") {
+      continue;
+    }
     if ($location_string) {
       $location_string .= "; ";
     }
