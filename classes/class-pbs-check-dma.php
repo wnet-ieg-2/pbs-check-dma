@@ -73,6 +73,9 @@ class PBS_Check_DMA {
       $zipcode = (string) $item['zipcode'];
       $state = '';
       $county = '';
+      if (empty($item['$links']) || !is_array($item['$links'])) {
+        return array('errors' => $response);
+      }
       foreach ($item['$links'] as $link) {
         if ($link['$relationship'] == "related") {
           $state = !empty($link['$items'][0]['$links'][0]['state']) ? $link['$items'][0]['$links'][0]['state'] : '';
