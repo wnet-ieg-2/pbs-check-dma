@@ -35,12 +35,14 @@ if (empty($_POST['media_id'])) {
   } else {
       
       
+        $thumbnail = esc_url(home_url()) . '/wp-content/plugins/pbs-check-dma/assets/img/mezz-default.gif';
+      
+      
         if (function_exists('pbs_video_utils_get_video') && !empty($_POST['media_id'])) {
             $video = pbs_video_utils_get_video($_POST['media_id']); 
             if (!empty($video[0]['metadata'])) {
                 $m = json_decode($video[0]['metadata']);
                 if (!empty($m->mezzanine)) {$thumbnail = $m->mezzanine . '?crop=1200x675&format=jpg';}
-                else {$thumbnail = '';}
             }
         }
       
@@ -56,5 +58,3 @@ exit($json);
 
 # JSONP if valid callback
 //exit("{$_GET['callback']}($json)");
-
-
