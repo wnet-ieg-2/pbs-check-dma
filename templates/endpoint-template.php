@@ -31,7 +31,7 @@ if (empty($_POST['media_id'])) {
     }
     $location_string .= "$key: $var";
   }
-  $location_string = !empty($location_string) ? $location_string : "a location that we are unable to determine";
+  $location_string = !empty($location_string) ? $location_string : "someplace where we cannot determine your US state and county";
   if ($apicheck[0]) {
     $media_id = $_POST['media_id'];
     $return = "<div class='video-wrap'><!-- DUE TO CONTRACTUAL OBLIGATIONS TO THE PRODUCERS, CAST, AND CREW OF THE PERFORMANCE RECORDED IN THE VIDEO BELOW, IT IS PROHIBITED TO PLAY THE VIDEO BELOW ON DEVICES THAT ARE NOT PHYSICALLY LOCATED WITHIN THE WNET/THIRTEEN BROADCAST AREA. THIS AREA IS COMPRISED OF THE FOLLOWING COUNTIES: $allowed_counties_string. PLEASE RESPECT THESE RIGHTS. Your device appears to be located in $location_string --><iframe src='//player.pbs.org/widget/partnerplayer/$media_id/?chapterbar=false' frameborder='0' marginwidth='0' marginheight='0' scrolling='no' webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe></div>";
