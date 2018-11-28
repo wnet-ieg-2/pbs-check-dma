@@ -127,11 +127,9 @@ class PBS_Check_DMA {
   public function get_location_by_reverse_geocode($latitude, $longitude, $provider=false) {
     $defaults = get_option($this->token);
     if (!$provider) {
-      if (empty($defaults["reverse_geocode_provider"])) {
-        $provider = "here.com";
-      }
+      $provider = !empty($defaults["reverse_geocode_provider"]) ? $defaults["reverse_geocode_provider"] : '';
     }
-    $authentication = !empty($defaults["reverse_geocode_authentication"]) ? $defaults["reverse_geocode_authentication"] : "app_id=***REMOVED***&app_code=***REMOVED***";
+    $authentication = !empty($defaults["reverse_geocode_authentication"]) ? $defaults["reverse_geocode_authentication"] : "";
       
     switch($provider) {
       case "here.com" :
@@ -160,7 +158,7 @@ class PBS_Check_DMA {
         return array("zipcode" => $address["PostalCode"], "state" => $address["State"], "county" => $address["County"], "country" => $address["Country"]);
     }
     // other providers TK, probably will be Google
-    return array("errors" => "invalid provider selected");
+    return array("errors" => "no valid reverse geolocation provider selected");
   }
 
   public function compare_county_to_allowed_list($location) {
