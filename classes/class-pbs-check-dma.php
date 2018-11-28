@@ -127,9 +127,10 @@ class PBS_Check_DMA {
   public function get_location_by_reverse_geocode($latitude, $longitude, $provider=false) {
     $defaults = get_option($this->token);
     if (!$provider) {
-      $provider = !empty($defaults["reverse_geocode_provider"]) ? $defaults["reverse_geocode_provider"] : '';
+      $provider = !empty($defaults["reverse_geocoding_provider"]) ? $defaults["reverse_geocoding_provider"] : '';
+      $provider = $provider == "no_provider" ? '' : $provider;
     }
-    $authentication = !empty($defaults["reverse_geocode_authentication"]) ? $defaults["reverse_geocode_authentication"] : "";
+    $authentication = !empty($defaults["reverse_geocoding_authentication"]) ? $defaults["reverse_geocoding_authentication"] : "";
       
     switch($provider) {
       case "here.com" :
