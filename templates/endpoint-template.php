@@ -62,22 +62,32 @@ if (empty($_POST['media_id'])) {
 
 
   $location_string = "";
-  foreach ($location as $key => $var) {
-    if ($key == "errors") {
-      continue;
+  if ($location) {
+    foreach ($location as $key => $var) {
+      if ($key == "errors" || $key == "declined_location") {
+        continue;
+      }
+      if ($location_string) {
+        $location_string .= "; ";
+      }
+      $location_string .= "$key: $var";
     }
-    if ($location_string) {
-      $location_string .= "; ";
-    }
-    $location_string .= "$key: $var";
   }
+  $
   $location_string = !empty($location_string) ? $location_string : "someplace where we cannot determine your US state and county";
   if ($in_dma) {
     $media_id = $_POST['media_id'];
-    $return = "<div class='video-wrap'><!-- DUE TO CONTRACTUAL OBLIGATIONS TO THE PRODUCERS, CAST, AND CREW OF THE PERFORMANCE RECORDED IN THE VIDEO BELOW, IT IS PROHIBITED TO PLAY THE VIDEO BELOW ON DEVICES THAT ARE NOT PHYSICALLY LOCATED WITHIN THE WNET/THIRTEEN BROADCAST AREA. THIS AREA IS COMPRISED OF THE FOLLOWING COUNTIES: $allowed_counties_string. PLEASE RESPECT THESE RIGHTS. Your device appears to be located in $location_string --><iframe src='//player.pbs.org/widget/partnerplayer/$media_id/?chapterbar=false' frameborder='0' marginwidth='0' marginheight='0' scrolling='no' webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe></div>";
+    $return["output"] = "<div class='video-wrap'><!-- DUE TO CONTRACTUAL OBLIGATIONS, IT IS PROHIBITED TO PLAY THE VIDEO BELOW ON DEVICES THAT ARE NOT PHYSICALLY LOCATED WITHIN THE OUR BROADCAST AREA. THIS AREA IS COMPRISED OF THE FOLLOWING COUNTIES: $allowed_counties_string. PLEASE RESPECT THESE RIGHTS. Your device appears to be located in $location_string --><iframe src='//player.pbs.org/widget/partnerplayer/$media_id/?chapterbar=false' frameborder='0' marginwidth='0' marginheight='0' scrolling='no' webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe></div>";
   } else {
+    // it is almost impossible for thumbnail to be empty
     $thumbnail = !empty($_POST['thumbnail']) ? $_POST['thumbnail'] : $api->assets_url . 'img/mezz-default.gif';
-    $return = "<div class='video-wrap dma-fail'><img src='$thumbnail'><div class='sorry'><div class='sorry-txt'><h3>Sorry, this content is only available to viewers within our broadcast area*.</h3><p>Check your <a href='https://www.pbs.org/tv_schedules/' target='_blank'>local PBS listings</a> to find out where you can watch.</p><p>*Our broadcast area contains the following counties:  $allowed_counties_string.</p><p>Your device appears to be located in $location_string. If this is not correct, it may be due to VPN software on your device, or mis-reporting of your location by your network or cable provider.</p></div></div></div>";
+
+    if (isset($location['declined_location'])) {
+      $location_string .= ". If that is not correct, we can get more accurate data if you allow us to access your location when prompted.";
+    } else {
+      $location_string .= ". If this is not correct, it may be due to VPN software on your device, or mis-reporting of your location by your network or cable provider."; 
+    }
+    $return["output"] = "<div class='video-wrap dma-fail'><img src='$thumbnail'><div class='sorry'><div class='sorry-txt'><h3>Sorry, this content is only available to viewers within our broadcast area*.</h3><p>Check your <a href='https://www.pbs.org/tv_schedules/' target='_blank'>local PBS listings</a> to find out where you can watch.</p><p>*Our broadcast area contains the following counties:  $allowed_counties_string.</p><p>Your device appears to be located in $location_string</p></div></div></div>";
   }
 }
 
