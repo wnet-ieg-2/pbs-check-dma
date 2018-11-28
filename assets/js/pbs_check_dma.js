@@ -5,12 +5,12 @@ jQuery(document).ready(function($) {
     else {$player = $('.dmarestrictedplayer');}
     var active = 0;
     var videoID = playerdiv.data('media');
-
+    var thumb = playerdiv.data('thumbnail');
     var dma_endpoint = "/pbs_check_dma/";
 
     $.ajax({
       url: dma_endpoint,
-      data: {media_id:videoID},
+      data: {media_id:videoID,thumbnail:thumb},
       type: 'POST',
       dataType: 'json',
       success: function(response) {

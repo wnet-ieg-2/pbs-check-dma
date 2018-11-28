@@ -8,7 +8,7 @@ class PBS_Check_DMA {
 	private $dir;
 	private $file;
 	private $assets_dir;
-	private $assets_url;
+	public $assets_url;
   private $token;
   public  $version;
 
@@ -17,7 +17,7 @@ class PBS_Check_DMA {
 		$this->assets_dir = trailingslashit( $this->dir ) . 'assets';
 		$this->assets_url = trailingslashit(plugin_dir_url( __DIR__ ) ) . 'assets';
     $this->token = 'pbs_check_dma';
-    $this->version = '0.3';
+    $this->version = '0.5';
 
 		// Load public-facing style sheet and JavaScript.
 		//add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -86,7 +86,8 @@ class PBS_Check_DMA {
           break;
         }
       }
-      $return = array('zipcode' => $zipcode, 'state' => $state, 'county' => $county);
+      $country = !empty($zipcode) ? 'US' : 'Outside of the US'; // this endpoint returns a 404 for non-US IP addresses
+      $return = array('zipcode' => $zipcode, 'state' => $state, 'county' => $county, 'country' => $country);
       return $return;
     }
   }
@@ -124,6 +125,52 @@ class PBS_Check_DMA {
   }
 
 
+  /* these two helpers from https://gist.github.com/arubacao/b5683b1dab4e4a47ee18fd55d9efbdd1 */
+  public function validateLatitude($lat) {
+    return preg_match('/^(\+|-)?(?:90(?:(?:\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,6})?))$/', $lat);
+  }
+  public function validateLongitude($long) {
+    return preg_match('/^(\+|-)?(?:180(?:(?:\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,6})?))$/', $long);
+  }
+
+
+  public function get_location_by_reverse_geocode($latitude, $longitude, $provider=false) {
+    if (!$this->validateLatitude($latitude)) { return false; }
+    if (!$this->validateLongitude($longitude)) { return false; }
+    $defaults = get_option($this->token);
+    if (!$provider) {
+      if (empty($defaults["reverse_geocode_provider"])) {
+        $provider = "here.com";
+      }
+    }
+    $authentication = !empty($defaults["reverse_geocode_authentication"]) ? $defaults["reverse_geocode_authentication"] : "app_id=***REMOVED***&app_code=***REMOVED***";
+      
+    switch($provider) {
+      case "here.com" :
+        $requesturl = "https://reverse.geocoder.api.here.com/6.2/reversegeocode.json?gen=9&mode=retrieveAreas";
+        $requesturl .= "&" . $authentication;
+        $requesturl .= "&" . urlencode("prox=$latitude,$longitude"); 
+        $response = wp_remote_get($requesturl);
+        if ( is_array( $response ) ) {
+          $header = $response['headers']; // array of http header lines
+          $body = $response['body']; // use the content
+        } else {
+          return array('errors' => $response);
+        }
+        $parsed = json_decode($body, TRUE);
+        if (!$parsed) {
+          return array('errors' => $response);
+        }
+        if (empty($parsed["Response"]["View"]["Result"]["Location"]["Address"])) {
+          return array('errors' => $response);
+        }
+        $address = $parsed["Response"]["View"]["Result"]["Location"]["Address"];
+        return array("zipcode" => $address["PostalCode"], "state" => $address["State"], "county" => $address["County"], "country" => $address["Country"]);
+    }
+    // other providers TK, probably will be Google
+    return array("errors" => "invalid provider selected");
+  }
+
   public function compare_county_to_allowed_list($location) {
     $state = !empty($location['state']) ? $location['state'] : '';
     $county = !empty($location['county']) ? $location['county'] : '';
@@ -144,7 +191,7 @@ class PBS_Check_DMA {
     return in_array(strtolower($county), array_map('strtolower', $these_counties));
   }
 
-  public function visitor_is_in_dma() {
+  public function visitor_ip_is_in_dma() {
     $ip = $this->get_remote_ip_address();
     $location = $this->get_location_from_ip($ip);
     $in_dma = $this->compare_county_to_allowed_list($location);
@@ -166,7 +213,7 @@ class PBS_Check_DMA {
         $large_thumb = $m->mezzanine;
       }
     }
-    $player = '<div class="dmarestrictedplayer" data-media="'.$video->tp_media_object_id.'"><img src="'.$large_thumb.'" /></div>';
+    $player = '<div class="dmarestrictedplayer" data-media="'.$video->tp_media_object_id.'" data-thumbnail="'.$large_thumb.'"><img src="'.$large_thumb.'" /></div>';
     $this->enqueue_scripts();
     return $player;
   }
