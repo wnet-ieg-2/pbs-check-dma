@@ -49,6 +49,7 @@ if (empty($_POST['media_id'])) {
   } else {
     $raw_location = $_COOKIE['dmalocation'];
     $location = json_decode(stripslashes($raw_location), TRUE);
+    $in_dma = $api->compare_county_to_allowed_list($location);
   } 
 
   $allowed_counties_ary = $api->format_counties_setting_for_use();
