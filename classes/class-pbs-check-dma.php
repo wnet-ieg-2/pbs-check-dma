@@ -9,7 +9,7 @@ class PBS_Check_DMA {
 	private $file;
 	private $assets_dir;
 	public $assets_url;
-  private $token;
+  public $token;
   public  $version;
 
 	public function __construct() {
@@ -17,7 +17,7 @@ class PBS_Check_DMA {
 		$this->assets_dir = trailingslashit( $this->dir ) . 'assets';
 		$this->assets_url = trailingslashit(plugin_dir_url( __DIR__ ) ) . 'assets';
     $this->token = 'pbs_check_dma';
-    $this->version = '0.5';
+    $this->version = '0.4';
 
 		// Load public-facing style sheet and JavaScript.
 		//add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -86,7 +86,7 @@ class PBS_Check_DMA {
           break;
         }
       }
-      $country = !empty($zipcode) ? 'US' : 'Outside of the US'; // this endpoint returns a 404 for non-US IP addresses
+      $country = !empty($zipcode) ? 'USA' : 'Outside of the US'; // this endpoint returns a 404 for non-US IP addresses
       $return = array('zipcode' => $zipcode, 'state' => $state, 'county' => $county, 'country' => $country);
       return $return;
     }
