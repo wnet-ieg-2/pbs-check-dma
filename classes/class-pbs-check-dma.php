@@ -124,19 +124,7 @@ class PBS_Check_DMA {
     return $returnary; 
   }
 
-
-  /* these two helpers from https://gist.github.com/arubacao/b5683b1dab4e4a47ee18fd55d9efbdd1 */
-  public function validateLatitude($lat) {
-    return preg_match('/^(\+|-)?(?:90(?:(?:\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,6})?))$/', $lat);
-  }
-  public function validateLongitude($long) {
-    return preg_match('/^(\+|-)?(?:180(?:(?:\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,6})?))$/', $long);
-  }
-
-
   public function get_location_by_reverse_geocode($latitude, $longitude, $provider=false) {
-    if (!$this->validateLatitude($latitude)) { return false; }
-    if (!$this->validateLongitude($longitude)) { return false; }
     $defaults = get_option($this->token);
     if (!$provider) {
       if (empty($defaults["reverse_geocode_provider"])) {
@@ -149,22 +137,26 @@ class PBS_Check_DMA {
       case "here.com" :
         $requesturl = "https://reverse.geocoder.api.here.com/6.2/reversegeocode.json?gen=9&mode=retrieveAreas";
         $requesturl .= "&" . $authentication;
-        $requesturl .= "&" . urlencode("prox=$latitude,$longitude"); 
+        $requesturl .= "&prox=$latitude,$longitude"; 
         $response = wp_remote_get($requesturl);
         if ( is_array( $response ) ) {
-          $header = $response['headers']; // array of http header lines
+          $headers = wp_remote_retrieve_headers($response); // array of http header lines
           $body = $response['body']; // use the content
         } else {
+          return array('errors' => $response);
+        }
+        $response_code = wp_remote_retrieve_response_code( $response );
+        if ($response_code && $response_code > 308) {
           return array('errors' => $response);
         }
         $parsed = json_decode($body, TRUE);
         if (!$parsed) {
           return array('errors' => $response);
         }
-        if (empty($parsed["Response"]["View"]["Result"]["Location"]["Address"])) {
-          return array('errors' => $response);
+        if (empty($parsed["Response"]["View"][0]["Result"][0]["Location"]["Address"])) {
+          return array('errors' => "No address", 'response' => $parsed["Response"]);
         }
-        $address = $parsed["Response"]["View"]["Result"]["Location"]["Address"];
+        $address = $parsed["Response"]["View"][0]["Result"][0]["Location"]["Address"];
         return array("zipcode" => $address["PostalCode"], "state" => $address["State"], "county" => $address["County"], "country" => $address["Country"]);
     }
     // other providers TK, probably will be Google
