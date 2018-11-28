@@ -5,32 +5,51 @@ remove_all_actions('wp_footer',1);
 remove_all_actions('wp_header',1);
 
 $api = new PBS_Check_DMA();
-
+$defaults = get_option($api->token);
+$station_common_name = !empty($defaults['station_common_name']) ? $defaults['station_common_name'] : ""; 
 $return = array();
 
 if (empty($_POST['media_id'])) {
   $return['client_ip_address'] = $api->get_remote_ip_address();
 } else {
   $in_dma = false;
-  // TK check a cookie for the location; will include zip, county, state, country, optional lat and lng
-
+  // check a cookie for the location; will include zip, county, state, country, optional lat and lng
+  if (empty($_COOKIE['dmalocation'])) {
     // no cookie? check the ip
     $ipcheck = $api->visitor_ip_is_in_dma();
     $in_dma = $ipcheck[0];
     $location = $ipcheck['location'];
+    $latitude = !empty($_POST['latitude']) ? $_POST['latitude'] : '';
+    $longitude = !empty($_POST['longitude']) ? $_POST['longitude'] : '';
     if (!$in_dma) {
-      // code TK, just structure
-      // no lat/lng passed?  
+      if (empty($latitude) && empty($longitude)) {
+      // no lat/lng passed? 
+        if (!empty($_POST['declined_location'])) {
+        $location["declined_location"] = TRUE;
         // have we requested a lat/lng already? refusal will be a browser-set cookie
+          setcookie('dmalocation', json_encode($location, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), time()+60*60*2, '/');
           // set location cookie and display the sorry page
-        // else die() to prompt a lan/lng request
+        } else {
+        // else add an element to the output to prompt a lan/lng request
+          $return["request_browser_location"] = true;
+        }
+      } else {
       // else lookup the location using lat/lng
-        // $location = $api->get_location_by_reverse_geocode($lat, $lng);
-        // $in_dma = $api->compare_county_to_allowed_list($location);
+        $location_request = $api->get_location_by_reverse_geocode($latitude, $longitude);
+        if (empty($location_request['errors']) && !empty($location_request['county'])) {
+          $location = $location_request;
+        } else {
+          error_log(json_encode($location_request));
+        }
+        $in_dma = $api->compare_county_to_allowed_list($location);
         // set location cookie
+        setcookie('dmalocation', json_encode($location, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), time()+60*60*2, '/');
+      }
     }
- 
-
+  } else {
+    $raw_location = $_COOKIE['dmalocation'];
+    $location = json_decode(stripslashes($raw_location), TRUE);
+  } 
 
   $allowed_counties_ary = $api->format_counties_setting_for_use();
   $allowed_counties_string = '';

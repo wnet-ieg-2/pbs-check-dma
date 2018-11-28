@@ -205,7 +205,7 @@ class PBS_Check_DMA {
         $large_thumb = $m->mezzanine;
       }
     }
-    $player = '<div class="dmarestrictedplayer" data-media="'.$video->tp_media_object_id.'" data-thumbnail="'.$large_thumb.'"><img src="'.$large_thumb.'" /></div>';
+    $player = '<div class="dmarestrictedplayer" data-media="'.$video->tp_media_object_id.'"><img src="'.$large_thumb.'" /></div>';
     $this->enqueue_scripts();
     return $player;
   }
