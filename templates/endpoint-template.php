@@ -96,5 +96,3 @@ $json = stripslashes(json_encode($return));
 header('content-type: application/json; charset=utf-8');
 exit($json);
 
-# JSONP if valid callback
-//exit("{$_GET['callback']}($json)");
