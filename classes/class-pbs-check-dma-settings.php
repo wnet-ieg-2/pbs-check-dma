@@ -53,6 +53,11 @@ class PBS_Check_DMA_Settings {
  
     add_settings_field( 'state_counties_array', 'Allowed Counties by State', array($this, 'settings_field'), $this->token, 'generalsettings', array('setting' => $this->token, 'field' => 'state_counties_array', 'type' => 'array', 'options' => array('count_source' => 'state_count', 'state' => array('label' => 'State', 'class' => 'small-text'), 'counties' => array('label' => 'Counties', 'class' => 'regular-text')),  'label' => 'Configure below which the list of counties, by state, that match our DMA.  Counties should be a comma-separated list of county names (eg Kings, Bronx, Queens), states should be two-char abrevs eg NY', 'class' => 'medium-text') );
     add_settings_field( 'state_count', 'State Count', array($this, 'settings_field'), $this->token, 'generalsettings', array('setting' => $this->token, 'field' => 'state_count', 'type' => 'text', 'default' => 4,  'label' => 'How many states appear above', 'class' => 'small-text') );
+
+    add_settings_field( 'reverse_geocoding_provider', 'Reverse GeoCoding Provider', array($this, 'settings_field'), $this->token, 'generalsettings', array('setting' => $this->token, 'field' => 'reverse_geocoding_provider', 'type' => 'select', 'options' => array('no_provider' => array('label' => 'none'), 'here.com' => array('label' => 'here.com') ),  'label' => 'Service that will handle translating browser locations (lat/long) into state/county info. Every provider has potential API costs if many requests are made.', 'class' => 'medium-text', 'default' => 'here.com') );
+
+    add_settings_field( 'reverse_geocoding_authentication', 'Reverse GeoCoding Authentication', array( $this, 'settings_field'), $this->token, 'generalsettings', array('setting' => $this->token, 'field' => 'reverse_geocoding_authentication', 'class' => 'regular-text', 'label' => 'access token, with variable names, required when making a request to the provider.  If authentication is two arguments include both separated with an &amp;, like so: app_id=***REMOVED***&amp;app_code=***REMOVED***') );
+
 	
 	}
 
@@ -111,6 +116,23 @@ class PBS_Check_DMA_Settings {
           $output .= "</div>";
         }
         echo $output;
+        break;
+      case "select":
+        $value = (($setting[$field] && strlen(trim($setting[$field]))) ? $setting[$field] : $default);
+        $optionlist = '';
+        foreach($options as $optionkey => $option) {
+          if (! is_array($option)) {
+            $option_label = $option;
+            $option_value = $option;
+          } else {
+            $option_label = (isset($option['label']) ? esc_attr($option['label']) : $option[0]);
+            $option_value = (isset($optionkey) ? esc_attr($optionkey) : $option[0]);
+          }
+          $selected = ($option_value == $value) ? ' selected' : '';
+          $optionlist .= "<option value='" . $option_value . "' $selected />$option_label</option>\n";
+        }
+        echo '<select name="' . $settingname . '[' . $field . ']" id="' . $settingname . '[' . $field . ']" class="' . $class . '">' . $optionlist . '</select>';
+        echo '<label for="' . $field . '"><p class="description">' . $label . '</p></label>';
         break;
 
       default:
