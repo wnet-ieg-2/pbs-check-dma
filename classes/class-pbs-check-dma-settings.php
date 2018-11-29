@@ -56,7 +56,7 @@ class PBS_Check_DMA_Settings {
 
     add_settings_field( 'reverse_geocoding_provider', 'Reverse GeoCoding Provider', array($this, 'settings_field'), $this->token, 'generalsettings', array('setting' => $this->token, 'field' => 'reverse_geocoding_provider', 'type' => 'select', 'options' => array('no_provider' => array('label' => 'none'), 'here.com' => array('label' => 'here.com') ),  'label' => 'Service that will handle translating browser locations (lat/long) into state/county info. Every provider has potential API costs if many requests are made.', 'class' => 'medium-text', 'default' => 'here.com') );
 
-    add_settings_field( 'reverse_geocoding_authentication', 'Reverse GeoCoding Authentication', array( $this, 'settings_field'), $this->token, 'generalsettings', array('setting' => $this->token, 'field' => 'reverse_geocoding_authentication', 'class' => 'regular-text', 'label' => 'access token, with variable names, required when making a request to the provider.  If authentication is two arguments include both separated with an &amp;, like so: app_id=***REMOVED***&amp;app_code=***REMOVED***') );
+    add_settings_field( 'reverse_geocoding_authentication', 'Reverse GeoCoding Authentication', array( $this, 'settings_field'), $this->token, 'generalsettings', array('setting' => $this->token, 'field' => 'reverse_geocoding_authentication', 'class' => 'regular-text', 'label' => 'access token, with variable names, required when making a request to the provider.  If authentication is two arguments include both separated with an &amp;, like so: app_id=somestring&amp;app_code=someotherstring') );
 
 	
 	}
