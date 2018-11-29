@@ -43,8 +43,11 @@ if (empty($_POST['media_id'])) {
         }
         $in_dma = $api->compare_county_to_allowed_list($location);
         // set location cookie
-        setcookie('dmalocation', json_encode($location, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), time()+60*60*2, '/');
+        setcookie('dmalocation', json_encode($location, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), 0, '/');
       }
+    } else {
+      // visitor is in the dma
+      setcookie('dmalocation', json_encode($location, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), 0, '/');
     }
   } else {
     $raw_location = $_COOKIE['dmalocation'];
