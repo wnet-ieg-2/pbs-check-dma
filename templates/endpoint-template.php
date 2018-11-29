@@ -13,7 +13,7 @@ if (empty($_POST['media_id'])) {
   $return['client_ip_address'] = $api->get_remote_ip_address();
 } else {
   $in_dma = false;
-  // check a cookie for the location; will include zip, county, state, country, optional lat and lng
+  // check a cookie for the location; will include zip, county, state, country
   if (empty($_COOKIE['dmalocation'])) {
     // no cookie? check the ip
     $ipcheck = $api->visitor_ip_is_in_dma();
@@ -27,7 +27,7 @@ if (empty($_POST['media_id'])) {
         if (!empty($_POST['declined_location'])) {
         $location["declined_location"] = TRUE;
         // have we requested a lat/lng already? refusal will be a browser-set cookie
-          setcookie('dmalocation', json_encode($location, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), time()+60*60*2, '/');
+          setcookie('dmalocation', json_encode($location, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), 0, '/');
           // set location cookie and display the sorry page
         } else {
         // else add an element to the output to prompt a lan/lng request
