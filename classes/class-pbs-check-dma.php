@@ -1,5 +1,5 @@
 <?php
-/* Core functions such as post and taxonomy definition and a basic interface for 
+/* Core functions an a basic interface for 
 *  retrieving pbs localize in PHP or via an AJAX call
 */
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -27,13 +27,11 @@ class PBS_Check_DMA {
     add_filter( 'query_vars', array($this, 'register_query_vars') );
     add_filter( 'template_include', array( $this, 'use_custom_template' ) );
 
-    // Setup the shortcode
-    add_shortcode( $this->token, array($this, 'do_shortcode') );
-
 	}
 
 
   public function enqueue_scripts() {
+    // I generally only do this on a specific page that need it
     wp_register_script( 'pbs_check_dma_js' , $this->assets_url . '/js/pbs_check_dma.js', array('jquery'), $this->version, true );
     wp_enqueue_script( 'pbs_check_dma_js' );
     wp_enqueue_style('pbs_check_dma_css', $this->assets_url . '/css/pbs_check_dma.css', null, $this->version);
@@ -86,7 +84,7 @@ class PBS_Check_DMA {
           break;
         }
       }
-      $country = !empty($zipcode) ? 'USA' : 'Outside of the US'; // this endpoint returns a 404 for non-US IP addresses
+      $country = !empty($zipcode) ? 'USA' : 'Outside of the US'; // the PBS endpoint returns a 404 for non-US IP addresses
       $return = array('zipcode' => $zipcode, 'state' => $state, 'county' => $county, 'country' => $country);
       return $return;
     }
@@ -102,11 +100,6 @@ class PBS_Check_DMA {
     return $_SERVER['REMOTE_ADDR'];
   }
 
-  public function compare_zip_to_local_list($zip) {
-    $filename = trailingslashit($this->assets_dir) . "zipary.php";
-    require($filename);
-    return in_array($zip, $zipary);
-  }
 
   public function format_counties_setting_for_use() {
     $defaults = get_option($this->token);
@@ -170,11 +163,6 @@ class PBS_Check_DMA {
     }
     $defaults = get_option($this->token);
     $counties = $this->format_counties_setting_for_use();
-    if (!$counties) {
-      $filename = trailingslashit($this->assets_dir) . "counties.php";
-      require($filename);
-      // $counties are an array in the above file
-    }
     if (!isset($counties[$state])) {
       return false;
     }
@@ -186,7 +174,6 @@ class PBS_Check_DMA {
     $ip = $this->get_remote_ip_address();
     $location = $this->get_location_from_ip($ip);
     $in_dma = $this->compare_county_to_allowed_list($location);
-    //$in_dma = $this->compare_zip_to_local_list($zipcode);
     return array($in_dma, "location" => $location);
   }
 
@@ -208,42 +195,5 @@ class PBS_Check_DMA {
     $this->enqueue_scripts();
     return $player;
   }
-
-  public function do_shortcode( $atts ) {
-    // pull some things from sitewide settings if not set by the shortcode
-    $defaults = get_option($this->token);
-    $allowed_args = array(
-      'station_call_letters' => $defaults['station_call_letters'],
-      'station_common_name' => $defaults['station_common_name'],
-      'ip_endpoint' => home_url('pbs_check_dma'),
-      'mismatch_dma_showdiv' => '#mismatch_dma_showdiv',
-      'match_dma_showdiv' => '#match_dma_showdiv',
-      'render_template' => 'false'
-    );
-
-    foreach ($allowed_args as $alrg=>$key) {
-      if ( !empty($defaults[$alrg])) {
-        $allowed_args[$alrg] = $defaults[$alrg];
-      }
-    }
-    $args = array();
-    if (is_array($atts)) {
-      $args = shortcode_atts($allowed_args, $atts, $this->token);
-    } else {
-      $args = $allowed_args;
-    }
-
-    /* enqueue the supporting javascript, it should all be in the footer so its fine in a shortcode */
-    $this->conditionally_enqueue_scripts();
-
-    $json_args = stripslashes(json_encode($args));
-    $jsonblock = '<script language="javascript">var pbs_check_dma_args = ' . $json_args . ' </script>';
-    $style = '<style>' . file_get_contents($this->assets_dir . '/css/pbs_check_dma.css') . '</style>';
-    $layout = '';
-    if ($args['render_template'] === 'true') {
-      $layout = '<div id="mismatch_dma_showdiv"></div><div id="match_dma_showdiv"></div>';
-    }
-    $return = $jsonblock . $style . $layout;
-    return $return;
-  }
 }
+// END OF FILE
