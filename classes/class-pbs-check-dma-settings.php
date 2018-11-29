@@ -157,7 +157,27 @@ class PBS_Check_DMA_Settings {
       </form>
     </div>
 <h3>Usage</h3>
-  TK
+  <p>In order to do any DMA restriction, you must fill out the state/county fields above with the complete list of counties in your DMA/broadcast area so that the site has something to compare visitor location to.</p>
+  <p>By default the plugin only checks against the PBS Localization API, which uses IP-based geolocation and is free, but can be wrong up to 10% of the time -- 1 in 10 viewers may be incorrectly blocked.  This is particularly an issue for mobile users; the reported locations of their IP addresses can be off by hundreds of miles.</p>
+  <p>Selecting a Reverse GeoCoding Provider allows the use of the much more accurate 'device location API' that takes advantage of things like GPS etc. This is much better for mobile devices particularly, but all devices with a web browser will have improved results.  The device returns a latitude/longitude, which then is sent to a reverse geocoding service to be converted into a info like 'county' and 'zip'.  That's not exactly free: all of the providers require signup; most have a 'free' tier (here.com is 250k requests/month, googlemaps is 40k requests/month).</p>
+  <h4>Theme Integraton</h4>
+  <p>After activating the plugin, wherever you want to render a DMA restricted video create an instance of the PBS_Check_DMA class -- eg 
+<pre>
+$checkdma = new PBS_Check_DMA();
+$player = $checkdma->build_dma_restricted_player(sometpmediaid, url_for_a_mezz_image);
+echo $player;
+</pre>
+("sometpmediaid" would be something like '92424242410', you'd get that from the Media Manager; and "url_for_a_mezz_image" would look something like 'https://image.pbs.org/video-assets/AIdcUYK-asset-mezzanine-16x9-ccRViYN.jpg') <br /><br />
+That will write out a DIV with the class 'dmarestrictedplayer' that will enclose a thumbnail image sized to 1200x675.  That will also automatically enqueue appropriate javascript and CSS on the page to act on any div with that class.  The javascript will then act on that class to look up the location of your visitor, compare it to the list of allowed counties, and if a match is found write out a PBS 'Partner Player' using the supplied TP Media Object ID.  
+</p>
+<p>
+For more manual control, you could also enqueue those files with 
+<pre>
+$checkdma = new PBS_Check_DMA();
+$checkdma->enqueue_scripts();
+</pre>
+and manually write out that DIV with a 'data-media' property with the value being the desired TP Media Object ID, enclosing the appropriate thumb image of your choice.
+</p>
     <?php
   }
 
