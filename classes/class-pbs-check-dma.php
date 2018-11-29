@@ -177,21 +177,40 @@ class PBS_Check_DMA {
     return array($in_dma, "location" => $location);
   }
 
-  public function build_dma_restricted_player($video) {
-    $imgDir = get_bloginfo('template_directory');
-    $m = json_decode($video->metadata);
+  public function build_dma_restricted_player($video, $mezzanine = '') {
+    /* this function accepts two styles of args for historical reasons
+     * one assumes that $video will be an object that 
+     * contains at least two elements: tp_media_object_id and mezzanine
+     * the other style is that $video will be a tp_media_object_id 
+     * and $mezzanine will be its own var */
+    if (is_object($video) && isset($video->tp_media_object_id)) {
+      $tp_media_object_id = $video->tp_media_object_id;
+      $metadata = json_decode($video->metadata);
+      $mezzanine = !empty($metadata->mezzanine) ? $metadata->mezzanine : $mezzanine;
+    } else {
+      $tp_media_object_id = $video;
+    }
 
     // video poster image.
-    if (empty($m->mezzanine)) {
-      $large_thumb = $imgDir . "/libs/images/default.png";
+    if (empty($mezzanine)) {
+      $large_thumb = $this->assets_url . "/img/mezz-default.gif";
     } else {
-      if (function_exists( 'wnet_video_cove_thumb')) {
-        $large_thumb = wnet_video_cove_thumb($m->mezzanine, 1200, 675);
-      } else {
-        $large_thumb = $m->mezzanine;
+      // make sure img url doesn't already contain a resize argument.
+      $resized = strpos($mezzanine, '.resize.');
+      $cropped = strpos($mezzanine, '.crop.');
+      // newer style
+      $altcropped = strpos($mezzanine, '?crop=');
+      // is it even from pbs.org?
+      $pbsimage = strpos($mezzanine, 'image.pbs.org');
+      if ($pbsimage !== false) {
+        if ($resized === false && $cropped === false && $altcropped === false) {
+            $mezzanine = $mezzanine . '?crop=1200x675&format=jpg';
+        }
       }
+      $mezzanine = str_replace("http://", "//", $mezzanine);
+      $large_thumb = $mezzanine;
     }
-    $player = '<div class="dmarestrictedplayer" data-media="'.$video->tp_media_object_id.'"><img src="'.$large_thumb.'" /></div>';
+    $player = '<div class="dmarestrictedplayer" data-media="'.$tp_media_object_id.'"><img src="'.$large_thumb.'" /></div>';
     $this->enqueue_scripts();
     return $player;
   }
