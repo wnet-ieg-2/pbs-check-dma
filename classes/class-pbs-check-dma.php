@@ -129,55 +129,53 @@ class PBS_Check_DMA {
       case "here.com" :
         $requesturl = "https://reverse.geocoder.api.here.com/6.2/reversegeocode.json?gen=9&mode=retrieveAreas";
         $requesturl .= "&" . $authentication;
-        $requesturl .= "&prox=$latitude,$longitude"; 
-        $response = wp_remote_get($requesturl);
-        if ( is_array( $response ) ) {
-          $headers = wp_remote_retrieve_headers($response); // array of http header lines
-          $body = $response['body']; // use the content
-        } else {
-          return array('errors' => $response);
-        }
-        $response_code = wp_remote_retrieve_response_code( $response );
-        if ($response_code && $response_code > 308) {
-          return array('errors' => $response);
-        }
-        $parsed = json_decode($body, TRUE);
-        if (!$parsed) {
-          return array('errors' => $response);
-        }
-        if (empty($parsed["Response"]["View"][0]["Result"][0]["Location"]["Address"])) {
-          return array('errors' => "No address", 'response' => $parsed["Response"]);
-        }
-        $address = $parsed["Response"]["View"][0]["Result"][0]["Location"]["Address"];
-        return array("zipcode" => $address["PostalCode"], "state" => $address["State"], "county" => $address["County"], "country" => $address["Country"]);
+        $requesturl .= "&prox=$latitude,$longitude";
+        break;
       case "fcc.gov" :
         $requesturl = "https://geo.fcc.gov/api/census/area?";
         $requesturl .= "&lat=$latitude&lon=$longitude";
         $requesturl .= "&format=json";
-        $response = wp_remote_get($requesturl);
-        if ( is_array( $response ) ) {
-          $headers = wp_remote_retrieve_headers($response); // array of http header lines
-          $body = $response['body']; // use the content
-        } else {
-          return array('errors' => $response);
+        break;
+    }
+    // other providers TK
+    if (empty($requesturl)) {
+      return array("errors" => "no reverse geolocation url can be constructed with provideer $provider");
+    }
+ 
+    $response = wp_remote_get($requesturl);
+    if ( is_array( $response ) ) {
+      $headers = wp_remote_retrieve_headers($response); // array of http header lines
+      $body = $response['body']; // use the content
+    } else {
+      return array('errors' => $response);
+    }
+    $response_code = wp_remote_retrieve_response_code( $response );
+    if ($response_code && $response_code > 308) {
+      return array('errors' => $response);
+    }
+    $parsed = json_decode($body, TRUE);
+    if (!$parsed) {
+      return array('errors' => 'json_decode error on response body', 'response' => $response);
+    }
+
+    // every provider has a different result format.  Format for our needs.
+    switch($provider) {
+      case "here.com" :
+        if (empty($parsed["Response"]["View"][0]["Result"][0]["Location"]["Address"])) {
+          return array('errors' => "No address", 'response' => $parsed["Response"]);
         }
-        $response_code = wp_remote_retrieve_response_code( $response );
-        if ($response_code && $response_code > 308) {
-          return array('errors' => $response);
-        }
-        $parsed = json_decode($body, TRUE);
-        if (!$parsed) {
-          return array('errors' => $response);
-        }
+        $address = $parsed["Response"]["View"][0]["Result"][0]["Location"]["Address"];
+        $return = array("zipcode" => $address["PostalCode"], "state" => $address["State"], "county" => $address["County"], "country" => $address["Country"]);
+        break;
+      case "fcc.gov" :
         if (empty($parsed["results"][0]["county_name"])) {
           return array('errors' => "No county", 'response' => $parsed);
         }
         $result = $parsed["results"][0];
-        return array("state" => $result["state_code"], "county" => $result["county_name"], "country" => "USA");
-
+        $return = array("state" => $result["state_code"], "county" => $result["county_name"], "country" => "USA");
+        break;
     }
-    // other providers TK, probably will be Google
-    return array("errors" => "no valid reverse geolocation provider selected");
+    return $return;
   }
 
   public function compare_county_to_allowed_list($location) {
