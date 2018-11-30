@@ -10,7 +10,7 @@ PBS Check DMA includes the following files:
 * pbs-check-dma.php, which invokes the plugin and provides the basic required functions.
 * A subdirectory named `classes` containing the core PHP class files that most functions depend on.
 * A subdirectory named `assets` containing JavaScript, CSS, and image files.
-* A subdirectory named 'templates' containing some PHP template files
+* A subdirectory named `templates` containing some PHP template files
 
 ## Installation
 
@@ -55,8 +55,8 @@ and manually write out that DIV with a 'data-media' property with the value bein
 
 ## Changelog
 
-> 0.1 2017-07-18 Initial base code
-> 0.4 2018-11-29 Complete revamp 
+* 0.1 2017-07-18 Initial base code
+* 0.4 2018-11-29 Complete revamp 
 
 ## License
 
