@@ -22,26 +22,32 @@ if (empty($_POST['media_id'])) {
     $latitude = !empty($_POST['latitude']) ? $_POST['latitude'] : '';
     $longitude = !empty($_POST['longitude']) ? $_POST['longitude'] : '';
     if (!$in_dma) {
-      if (empty($latitude) && empty($longitude)) {
-      // no lat/lng passed? 
-        if (!empty($_POST['declined_location'])) {
-        $location["declined_location"] = TRUE;
-        // have we requested a lat/lng already? refusal will be a browser-set cookie
-          setcookie('dmalocation', json_encode($location, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), 0, '/');
-          // set location cookie and display the sorry page
-        } else {
-        // else add an element to the output to prompt a lan/lng request
-          $return["request_browser_location"] = true;
-        }
-      } else {
-      // else lookup the location using lat/lng
-        $location_request = $api->get_location_by_reverse_geocode($latitude, $longitude);
-        if (empty($location_request['errors']) && !empty($location_request['county'])) {
-          $location = $location_request;
-        }
-        $in_dma = $api->compare_county_to_allowed_list($location);
+      if ($defaults['reverse_geocoding_provider'] == 'no_provider') {
+        // don't bother trying to get the lat/lng because there's no way to look up the location
         // set location cookie
         setcookie('dmalocation', json_encode($location, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), 0, '/');
+      } else {
+        if (empty($latitude) && empty($longitude)) {
+        // no lat/lng passed? 
+          if (!empty($_POST['declined_location'])) {
+          $location["declined_location"] = TRUE;
+          // have we requested a lat/lng already? refusal will be a browser-set cookie
+            setcookie('dmalocation', json_encode($location, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), 0, '/');
+            // set location cookie and display the sorry page
+          } else {
+          // else add an element to the output to prompt a lan/lng request
+            $return["request_browser_location"] = true;
+          }
+        } else {
+        // else lookup the location using lat/lng
+          $location_request = $api->get_location_by_reverse_geocode($latitude, $longitude);
+          if (empty($location_request['errors']) && !empty($location_request['county'])) {
+            $location = $location_request;
+          }
+          $in_dma = $api->compare_county_to_allowed_list($location);
+          // set location cookie
+          setcookie('dmalocation', json_encode($location, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), 0, '/');
+        }
       }
     } else {
       // visitor is in the dma
