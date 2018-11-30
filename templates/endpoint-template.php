@@ -38,8 +38,6 @@ if (empty($_POST['media_id'])) {
         $location_request = $api->get_location_by_reverse_geocode($latitude, $longitude);
         if (empty($location_request['errors']) && !empty($location_request['county'])) {
           $location = $location_request;
-        } else {
-          error_log(json_encode($location_request));
         }
         $in_dma = $api->compare_county_to_allowed_list($location);
         // set location cookie
