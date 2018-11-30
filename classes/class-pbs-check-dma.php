@@ -169,6 +169,7 @@ class PBS_Check_DMA {
         break;
       case "fcc.gov" :
         if (empty($parsed["results"][0]["county_name"])) {
+          // FCC.gov returns no results for anything outside of the US, which is fine
           return array('errors' => "No county", 'response' => $parsed);
         }
         $result = $parsed["results"][0];
@@ -179,9 +180,14 @@ class PBS_Check_DMA {
   }
 
   public function compare_county_to_allowed_list($location) {
+    /* this assumes an array with elements 'state' and 'county'
+     * which it compares to the corresponding values in the settings
+     * theoretically there may be some non-US country that has a state abbreviation 
+     * that matches our setting, and a corresponding county in that 'state'
+     * but this is highly unlikely */
     $state = !empty($location['state']) ? $location['state'] : '';
     $county = !empty($location['county']) ? $location['county'] : '';
-    if (empty($location['state']) || empty($location['state'])) {
+    if (empty($location['state']) || empty($location['county'])) {
       return false;
     }
     $defaults = get_option($this->token);
