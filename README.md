@@ -34,9 +34,11 @@ Selecting a Reverse GeoCoding Provider allows the use of the much more accurate 
 
 After activating the plugin, wherever you want to render a DMA restricted video create an instance of the PBS_Check_DMA class -- eg
 
-`$checkdma = new PBS_Check_DMA();
+```php
+$checkdma = new PBS_Check_DMA();
 $player = $checkdma->build_dma_restricted_player(sometpmediaid, url_for_a_mezz_image);
-echo $player;`
+echo $player;
+```
 
 ("sometpmediaid" would be something like '92424242410', you'd get that from the Media Manager; and "url_for_a_mezz_image" would look something like 'https://image.pbs.org/video-assets/AIdcUYK-asset-mezzanine-16x9-ccRViYN.jpg')
 
@@ -44,15 +46,17 @@ That will write out a DIV with the class 'dmarestrictedplayer' that will enclose
 
 For more manual control, you could also enqueue those files with
 
-`$checkdma = new PBS_Check_DMA();
-$checkdma->enqueue_scripts();`
+```php
+$checkdma = new PBS_Check_DMA();
+$checkdma->enqueue_scripts();
+```
 
 and manually write out that DIV with a 'data-media' property with the value being the desired TP Media Object ID, enclosing the appropriate thumb image of your choice. 
 
 ## Changelog
 
-0.1 2017-07-18 Initial base code
-0.4 2018-11-29 Complete revamp 
+> 0.1 2017-07-18 Initial base code
+> 0.4 2018-11-29 Complete revamp 
 
 ## License
 
