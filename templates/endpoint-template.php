@@ -25,6 +25,8 @@ if (empty($_POST['media_id'])) {
       if ($defaults['reverse_geocoding_provider'] == 'no_provider') {
         // don't bother trying to get the lat/lng because there's no way to look up the location
         // set location cookie
+        // but make sure to strip out zipcode, that's a little personal
+        unset($location['zipcode']);
         setcookie('dmalocation', json_encode($location, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), 0, '/');
       } else {
         if (empty($latitude) && empty($longitude)) {
@@ -32,6 +34,8 @@ if (empty($_POST['media_id'])) {
           if (!empty($_POST['declined_location'])) {
           $location["declined_location"] = TRUE;
           // have we requested a lat/lng already? refusal will be a browser-set cookie
+          // but make sure to strip out zipcode, that's a little personal
+            unset($location['zipcode']);
             setcookie('dmalocation', json_encode($location, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), 0, '/');
             // set location cookie and display the sorry page
           } else {
@@ -46,11 +50,15 @@ if (empty($_POST['media_id'])) {
           }
           $in_dma = $api->compare_county_to_allowed_list($location);
           // set location cookie
+          // but make sure to strip out zipcode, that's a little personal
+          unset($location['zipcode']);
           setcookie('dmalocation', json_encode($location, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), 0, '/');
         }
       }
     } else {
       // visitor is in the dma
+      // but make sure to strip out zipcode, that's a little personal
+      unset($location['zipcode']);
       setcookie('dmalocation', json_encode($location, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), 0, '/');
     }
   } else {
