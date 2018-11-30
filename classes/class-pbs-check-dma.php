@@ -150,6 +150,31 @@ class PBS_Check_DMA {
         }
         $address = $parsed["Response"]["View"][0]["Result"][0]["Location"]["Address"];
         return array("zipcode" => $address["PostalCode"], "state" => $address["State"], "county" => $address["County"], "country" => $address["Country"]);
+      case "fcc.gov" :
+        $requesturl = "https://geo.fcc.gov/api/census/area?";
+        $requesturl .= "&lat=$latitude&lon=$longitude";
+        $requesturl .= "&format=json";
+        $response = wp_remote_get($requesturl);
+        if ( is_array( $response ) ) {
+          $headers = wp_remote_retrieve_headers($response); // array of http header lines
+          $body = $response['body']; // use the content
+        } else {
+          return array('errors' => $response);
+        }
+        $response_code = wp_remote_retrieve_response_code( $response );
+        if ($response_code && $response_code > 308) {
+          return array('errors' => $response);
+        }
+        $parsed = json_decode($body, TRUE);
+        if (!$parsed) {
+          return array('errors' => $response);
+        }
+        if (empty($parsed["results"][0]["county_name"])) {
+          return array('errors' => "No county", 'response' => $parsed);
+        }
+        $result = $parsed["results"][0];
+        return array("state" => $result["state_code"], "county" => $result["county_name"], "country" => "USA");
+
     }
     // other providers TK, probably will be Google
     return array("errors" => "no valid reverse geolocation provider selected");
