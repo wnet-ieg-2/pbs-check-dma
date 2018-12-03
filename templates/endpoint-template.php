@@ -14,14 +14,23 @@ if (empty($_POST['media_id'])) {
 } else {
   $in_dma = false;
   // check a cookie for the location; will include zip, county, state, country
-  if (empty($_COOKIE['dmalocation'])) {
+  if (!empty($_COOKIE['dmalocation'])) {
+    $raw_location = $_COOKIE['dmalocation'];
+    $location = json_decode(stripslashes($raw_location), TRUE);
+    $in_dma = $api->compare_county_to_allowed_list($location);
+  } else {
     // no cookie? check the ip
     $ipcheck = $api->visitor_ip_is_in_dma();
     $in_dma = $ipcheck[0];
     $location = $ipcheck['location'];
     $latitude = !empty($_POST['latitude']) ? $_POST['latitude'] : '';
     $longitude = !empty($_POST['longitude']) ? $_POST['longitude'] : '';
-    if (!$in_dma) {
+    if ($in_dma) {
+      // visitor is in the dma
+      // but make sure to strip out zipcode, that's a little personal
+      unset($location['zipcode']);
+      setcookie('dmalocation', json_encode($location, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), 0, '/');
+    } else {
       if ($defaults['reverse_geocoding_provider'] == 'no_provider') {
         // don't bother trying to get the lat/lng because there's no way to look up the location
         // set location cookie
@@ -55,16 +64,7 @@ if (empty($_POST['media_id'])) {
           setcookie('dmalocation', json_encode($location, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), 0, '/');
         }
       }
-    } else {
-      // visitor is in the dma
-      // but make sure to strip out zipcode, that's a little personal
-      unset($location['zipcode']);
-      setcookie('dmalocation', json_encode($location, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), 0, '/');
     }
-  } else {
-    $raw_location = $_COOKIE['dmalocation'];
-    $location = json_decode(stripslashes($raw_location), TRUE);
-    $in_dma = $api->compare_county_to_allowed_list($location);
   } 
 
   $allowed_counties_ary = $api->format_counties_setting_for_use();
