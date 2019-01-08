@@ -101,7 +101,7 @@ if (empty($_POST['media_id'])) {
     if (isset($location['declined_location'])) {
       $location_string .= ". If that is not correct, we can get more accurate data if you allow us to access your location when prompted.";
     } else {
-      $location_string .= ". If this is not correct, it may be due to VPN software on your device, or mis-reporting of your location by your network or cable provider."; 
+      $location_string .= ". If this is not correct, it may be due to VPN software that may be installed on your device, or mis-reporting of your location by your internet or cable provider."; 
     }
     $return["output"] = "<div class='video-wrap dma-fail'><img src='$thumbnail'><div class='sorry'><div class='sorry-txt'><h3>Sorry, this content is only available to viewers within our broadcast area*.</h3><p>Check your <a href='https://www.pbs.org/tv_schedules/' target='_blank'>local PBS listings</a> to find out where you can watch.</p><p>*Our broadcast area contains the following counties:  $allowed_counties_string.</p><p>Your device appears to be located in $location_string</p></div></div></div>";
   }
