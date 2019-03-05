@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: PBS Check DMA 
- * Version: 0.1
+ * Version: 0.5
  * Plugin URI: http://ieg.wnet.org/
  * Description: Check if a visitor is in a PBS stations' DMA
  * Author: William Tam
