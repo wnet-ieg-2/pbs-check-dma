@@ -1,6 +1,6 @@
 # PBS Check DMA
 
-PBS Check DMA is a plugin to to check if a visitor is physically in the DMA of a PBS station
+PBS Check DMA is a WordPress plugin geo-filter specific PBS-hosted videos to visitors who are physically located within the DMA of a PBS station. 
 
 
 ## Contents
