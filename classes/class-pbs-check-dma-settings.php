@@ -58,6 +58,8 @@ class PBS_Check_DMA_Settings {
 
     add_settings_field( 'reverse_geocoding_authentication', 'Reverse GeoCoding Authentication', array( $this, 'settings_field'), $this->token, 'generalsettings', array('setting' => $this->token, 'field' => 'reverse_geocoding_authentication', 'class' => 'regular-text', 'label' => 'access token, with variable names, required when making a request to the provider.  If authentication is two arguments include both separated with an &amp;, like so: app_id=somestring&amp;app_code=someotherstring') );
 
+    add_settings_field( 'jwplayer_uri', 'JW Player URI', array( $this, 'settings_field'), $this->token, 'generalsettings', array('setting' => $this->token, 'field' => 'jwplayer_uri', 'class' => 'regular-text', 'label' => 'Full URI to the JW Player javascript, unique to your JWPlayer.com account', 'default' => '') );
+
 	
 	}
 
