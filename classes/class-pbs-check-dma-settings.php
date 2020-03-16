@@ -187,22 +187,52 @@ and manually write out that DIV with a 'data-media' property with the value bein
   // This section is for meta boxes on the individual program pages
 
   public function meta_box_setup( $post_type ) {
-    if ( $post_type == 'programs' ) {
-      add_meta_box( 'pbs_check_dma', 'DMA Restriction', array( $this, 'metabox_content' ), 'programs', 'side' );
+    if ( $post_type == 'programs' || $post_type == 'page' ) {
+      add_meta_box( 'pbs_check_dma', 'DMA Restriction', array( $this, 'metabox_content' ), $post_type);
     }
   }
 
   public function metabox_content() {
     global $post_id;
+    $post_data = get_post($post_id, ARRAY_A); // standardizing on an array for everything here
+    $postmeta_data = get_post_meta($post_id);
 
-    $dma_restrict = get_post_meta( $post_id, 'dma_restricted_video', TRUE );
-
-    $restricted = !empty($dma_restrict) ? $dma_restrict : false;
+    $restricted = !empty($postmeta_data['dma_restricted_video'][0]) ? $postmeta_data['dma_restricted_video'][0] : false;
     $checked = $restricted ? 'checked' : '';
 
     $html = '<input type="hidden" name="dma_restricted_nonce" id="dma_restricted_nonce" value="' . wp_create_nonce( 'dma_restricted_nonce' ) . '" />';
     $html .= '<input type="checkbox" name="dma_restricted_video" id="dma_restricted_video" value="true" ' . $checked . ' />';
-    $html .= '<label for="dma_restricted_video">DMA-restrict videos</label><div class="description"><i>Checking this box will force all videos on this program page to go through the DMA restriction setup.</i></div>';
+    $html .= '<label for="dma_restricted_video">DMA-restrict videos</label><div class="description"><i>Checking this box will force any videos on this page to go through the DMA restriction setup.</i></div>';
+    if ($post_data['post_type'] !== 'programs') {
+      $vid_uri = !empty($postmeta_data['dma_restricted_video_uri'][0]) ? $postmeta_data['dma_restricted_video_uri'][0] : '';
+      $html .= '<label for="dma_restricted_video_uri">Stream URI</label><div class="description"><i>URI for the HLS stream that will be played.</i></div>';
+      $html .= '<input type="text" name="dma_restricted_video_uri" id="dma_restricted_video_uri" class="regular-text" value = ' . $vid_uri . '><br />';
+      $vid_image = !empty($postmeta_data['dma_restricted_video_image'][0]) ? $postmeta_data['dma_restricted_video_image'][0] : '';
+      $html .= '<label for="dma_restricted_video_image">Preview image</label><div class="description"><i>URI for 16x9 mezz image for vid preview</i></div>';
+      $html .= '<input type="text" name="dma_restricted_video_image" id="dma_restricted_video_image" class="regular-text" value = ' . $vid_image . '><button class="upload-image button-primary" data-field="dma_restricted_video_image"><span class="dashicons dashicons-camera"></span></button><br />';
+      $html .= <<<EOF
+  <script>
+  jQuery(document).ready( function( $ ) {
+
+    $('button.upload-image').click(function() {
+    field = $(this).data('field');
+        tb_show( '', 'media-upload.php?type=image&amp;TB_iframe=true' );
+        return false;
+    });
+
+    window.send_to_editor = function(html) {
+
+        imgurl = $('img',html).attr('src');
+        $('#' + field).val(imgurl);
+        tb_remove();
+    }
+
+});
+</script>
+EOF;
+
+    }
+
     echo $html;
   }
 
@@ -217,11 +247,14 @@ and manually write out that DIV with a 'data-media' property with the value bein
     if ( ! current_user_can( 'edit_post', $post_id ) ) {
       return $post_id;
     }
-    $value = isset( $_POST['dma_restricted_video']) ? $_POST['dma_restricted_video'] : false;
-    if ($value) {
-      update_post_meta( $post_id , 'dma_restricted_video', $value );
-    } else {
-      delete_post_meta( $post_id , 'dma_restricted_video');
+    $fields = array('dma_restricted_video', 'dma_restricted_video_uri', 'dma_restricted_video_image');
+    foreach ($fields as $field) {
+      $value = isset( $_POST[$field]) ? $_POST[$field] : false;
+      if ($value) {
+        update_post_meta( $post_id , $field, $value );
+      } else {
+        delete_post_meta( $post_id , $field);
+      }
     }
   }
 
