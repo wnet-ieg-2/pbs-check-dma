@@ -1,9 +1,9 @@
 <?php
 /*
  * Plugin Name: PBS Check DMA 
- * Version: 0.5
+ * Version: 0.6
  * Plugin URI: http://ieg.wnet.org/
- * Description: Check if a visitor is in a PBS stations' DMA
+ * Description: Use geolocation to restrict content based on a PBS stations' DMA
  * Author: William Tam
  * Author URI: http://ieg.wnet.org/
  * Requires at least: 4.0 
