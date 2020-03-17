@@ -4,7 +4,7 @@ jQuery(document).ready(function($) {
     if (typeof(passedDiv) !== 'undefined' && passedDiv) {playerdiv = $(passedDiv);}
     else {playerdiv = $('.dmarestrictedplayer');}
     var videoID = playerdiv.data('media');
-    var thumb = $('img', playerdiv).attr('src');
+    thumb = $('img', playerdiv).attr('src');
     var dma_endpoint = "/pbs_check_dma/";
     var postdata = {media_id:videoID,thumbnail:thumb};
     if (browser_lat && browser_long) {
@@ -14,6 +14,10 @@ jQuery(document).ready(function($) {
     if (typeof(declined_location) !== 'undefined' && declined_location) {
       postdata["declined_location"] = true;
     }
+    if (typeof(playerdiv.data('postid')) !== 'undefined') {
+      postdata["postid"] = playerdiv.data('postid');
+    }
+
     $.ajax({
       url: dma_endpoint,
       data: postdata,
@@ -22,9 +26,11 @@ jQuery(document).ready(function($) {
       success: function(response) {
         if (typeof(response.request_browser_location) === 'undefined') {
           playerdiv.html(response.output);
+          playCustomHLSIfPresent(playerdiv);
         } else {
           if (!navigator.geolocation || declined_location) {
             playerdiv.html(response.output);
+            playCustomHLSIfPresent(playerdiv);
           } else {
             navigator.geolocation.getCurrentPosition(function(position) {
               browser_lat = position.coords.latitude;
@@ -35,6 +41,13 @@ jQuery(document).ready(function($) {
         }
       }
     });
+  }
+
+  function playCustomHLSIfPresent(parentdiv) {
+    if (typeof($('#custom_hls_player', parentdiv)) !== 'undefined') {
+      hlsplayer = $('#custom_hls_player', playerdiv);
+      jwplayer("custom_hls_player").setup({'file': hlsplayer.data('hls'), width: '100%', image: thumb});
+    }
   }
 
   function geoerrorhandler(error) {
@@ -48,6 +61,7 @@ jQuery(document).ready(function($) {
   var playerdiv = '';
   var browser_lat = '';
   var browser_long = '';
+  var thumb = '';
 
   if ($(".dmarestrictedplayer[data-media]")[0]){
     $( ".dmarestrictedplayer" ).each(function( index ) {

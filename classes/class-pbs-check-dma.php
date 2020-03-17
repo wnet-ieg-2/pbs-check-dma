@@ -250,15 +250,19 @@ class PBS_Check_DMA {
     /* this just renders a static div for AJAX to act on later */
     global $post;
     $post_id = $post->ID;
-    $return = "Nothing here for $post_id";
+    $return = "";
     $postmeta = get_post_meta($post_id);
     if (!empty($postmeta['dma_restricted_video_uri'][0])) {
+      $defaults = get_option($this->token);
+      $jwplayer_uri = !empty($defaults['jwplayer_uri']) ? trim($defaults['jwplayer_uri']) : '';
+      if (empty($jwplayer_uri)) { return; }
       $mezz_image = $this->assets_url . "/img/mezz-default.gif";
       if (!empty($postmeta['dma_restricted_video_image'][0])) {
         $mezz_image = $postmeta['dma_restricted_video_image'][0];
       }
-      $return = '<div class="dma_restrictedplayer" data-media="custom_hls" data-postid="' . $post_id . '"><img src="'.$mezz_image.'" /></div>';
-    }
+      $return = '<div class="dmarestrictedplayer" data-media="custom_hls" data-postid="' . $post_id . '"><img src="'.$mezz_image.'" /></div>';
+      $return .= "<script src='$jwplayer_uri'></script><script src='" . $this->assets_url . "/js/pbs_check_dma.js'></script>";
+     }
     return $return;
   }
 
