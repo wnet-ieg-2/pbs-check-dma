@@ -246,10 +246,14 @@ class PBS_Check_DMA {
     return $player;
   }
 
-  public function render_shortcode() {
+  public function render_shortcode( $atts = array() ) {
     /* this just renders a static div for AJAX to act on later */
     global $post;
-    $post_id = $post->ID;
+    $args = shortcode_atts(array(
+      'post_id' => $post->ID),
+      $atts);
+    $post_id = $args['post_id'];
+
     $return = "";
     $postmeta = get_post_meta($post_id);
     if (!empty($postmeta['dma_restricted_video_uri'][0])) {
