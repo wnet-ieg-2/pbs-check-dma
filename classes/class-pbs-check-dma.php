@@ -255,7 +255,7 @@ class PBS_Check_DMA {
     $post_id = $args['post_id'];
 
     $return = "";
-    $postmeta = get_post_meta($post_id);
+    $postmeta = get_post_custom($post_id);
     if (!empty($postmeta['dma_restricted_video_uri'][0])) {
       $defaults = get_option($this->token);
       $jwplayer_uri = !empty($defaults['jwplayer_uri']) ? trim($defaults['jwplayer_uri']) : '';
