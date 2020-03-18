@@ -210,6 +210,7 @@ and manually write out that DIV with a 'data-media' property with the value bein
       $vid_image = !empty($postmeta_data['dma_restricted_video_image'][0]) ? $postmeta_data['dma_restricted_video_image'][0] : '';
       $html .= '<label for="dma_restricted_video_image">Preview image</label><div class="description"><i>URI for 16x9 mezz image for vid preview</i></div>';
       $html .= '<input type="text" name="dma_restricted_video_image" id="dma_restricted_video_image" class="regular-text" value = ' . $vid_image . '><button class="upload-image button-primary" data-field="dma_restricted_video_image"><span class="dashicons dashicons-camera"></span></button><br />';
+      $html .= "<p class='description'>You can make the DMA restricted player with the video and image above display by ading the shortcode <code>[dma_restricted_player]</code> to the content if on this page, or on other posts or pages use <br /><code>[dma_restricted_player post_id=$post_id]</code></p>";
       $html .= <<<EOF
   <script>
   jQuery(document).ready( function( $ ) {
