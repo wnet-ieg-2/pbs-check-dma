@@ -89,14 +89,15 @@ if (empty($_POST['media_id'])) {
       $location_string .= "$key: $var";
     }
   }
-  $
   $location_string = !empty($location_string) ? $location_string : "someplace where we cannot determine your US state and county";
   if ($in_dma) {
     $media_id = $_POST['media_id'];
+    // Partner Player
     $playerstring = "<iframe src='//player.pbs.org/widget/partnerplayer/$media_id/?chapterbar=false&endscreen=false' frameborder='0' marginwidth='0' marginheight='0' scrolling='no' webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>";
     if (!empty($_POST['postid'] && $media_id == 'custom_hls')) {
       $postmeta = get_post_meta($_POST['postid']);
       if (!empty($postmeta['dma_restricted_video_uri'][0])) {
+        // JW Player if there's a custom HLS
         $playerstring = "<div id = 'custom_hls_player' data-hls='" . $postmeta['dma_restricted_video_uri'][0] . "'></div>";
       }
     }

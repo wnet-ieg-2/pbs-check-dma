@@ -24,11 +24,16 @@ jQuery(document).ready(function($) {
       type: 'POST',
       dataType: 'json',
       success: function(response) {
-        if (typeof(response.request_browser_location) === 'undefined') {
+        if (typeof(response.request_browser_location) === 'undefined') { 
+          /* "request_browser_location" is a return value from the endpoint 
+           * if we haven't satisfied the location requirement yet. 
+           * undefined means we dont need to know anymore  */
           playerdiv.html(response.output);
           playCustomHLSIfPresent(playerdiv);
         } else {
           if (!navigator.geolocation || declined_location) {
+            /* still possibly to have a playable video:
+             *  maybe IP geolcation worked, maybe it didnt */
             playerdiv.html(response.output);
             playCustomHLSIfPresent(playerdiv);
           } else {
