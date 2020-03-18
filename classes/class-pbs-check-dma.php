@@ -264,8 +264,8 @@ class PBS_Check_DMA {
       if (!empty($postmeta['dma_restricted_video_image'][0])) {
         $mezz_image = $postmeta['dma_restricted_video_image'][0];
       }
-      $return = '<div class="dmarestrictedplayer" data-media="custom_hls" data-postid="' . $post_id . '"><img src="'.$mezz_image.'" /></div>';
-      $return .= "<script src='$jwplayer_uri'></script><script src='" . $this->assets_url . "/js/pbs_check_dma.js'></script>";
+      $return = '<div class="dmarestrictedplayer program-player" data-media="custom_hls" data-postid="' . $post_id . '"><img src="'.$mezz_image.'" /></div>';
+      $return .= "<link rel=stylesheet media='all' type='text/css' href='" . $this->assets_url . "/css/pbs_check_dma.css' /><script src='$jwplayer_uri'></script><script src='" . $this->assets_url . "/js/pbs_check_dma.js'></script>";
      }
     return $return;
   }
