@@ -101,7 +101,7 @@ if (empty($_POST['media_id'])) {
         $playerstring = "<div id = 'custom_hls_player' data-hls='" . $postmeta['dma_restricted_video_uri'][0] . "'></div>";
       }
     }
-    $return["output"] = "<!-- DUE TO CONTRACTUAL OBLIGATIONS, IT IS PROHIBITED TO PLAY THE VIDEO BELOW ON DEVICES THAT ARE NOT PHYSICALLY LOCATED WITHIN THE OUR BROADCAST AREA. THIS AREA IS COMPRISED OF THE FOLLOWING COUNTIES: $allowed_counties_string. PLEASE RESPECT THESE RIGHTS. Your device appears to be located in $location_string -->$playerstring";
+    $return["output"] = "<!-- DUE TO CONTRACTUAL OBLIGATIONS, IT IS PROHIBITED TO PLAY THE VIDEO BELOW ON DEVICES THAT ARE NOT PHYSICALLY LOCATED WITHIN OUR BROADCAST AREA. THIS AREA IS COMPRISED OF THE FOLLOWING COUNTIES: $allowed_counties_string. PLEASE RESPECT THESE RIGHTS. Your device appears to be located in $location_string -->$playerstring";
   } else {
     // it is almost impossible for thumbnail to be empty
     $thumbnail = !empty($_POST['thumbnail']) ? $_POST['thumbnail'] : $api->assets_url . 'img/mezz-default.gif';
