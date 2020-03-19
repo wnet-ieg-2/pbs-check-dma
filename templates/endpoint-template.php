@@ -104,10 +104,10 @@ if (empty($_POST['media_id'])) {
     $return["output"] = "<!-- DUE TO CONTRACTUAL OBLIGATIONS, IT IS PROHIBITED TO PLAY THE VIDEO BELOW ON DEVICES THAT ARE NOT PHYSICALLY LOCATED WITHIN OUR BROADCAST AREA. THIS AREA IS COMPRISED OF THE FOLLOWING COUNTIES: $allowed_counties_string. PLEASE RESPECT THESE RIGHTS. Your device appears to be located in $location_string -->$playerstring";
   } else {
     // it is almost impossible for thumbnail to be empty
-    $thumbnail = !empty($_POST['thumbnail']) ? $_POST['thumbnail'] : $api->assets_url . 'img/mezz-default.gif';
+    $thumbnail = !empty($_POST['thumbnail']) ? $_POST['thumbnail'] : $api->assets_url . '/img/mezz-default.gif';
 
     if (isset($location['declined_location'])) {
-      $location_string .= ". If this location is not correct, please <button class='retryDMALocation'>click to re-check</button> and give permission to access your location when prompted. <br />Having trouble enabling your device for geolocation? <a href='https://www.gps-coordinates.net/geolocation' target=_new>Here are instructions for all browsers and devices.</a> ";
+      $location_string .= ". If this location is not correct, please <button class='retryDMALocation'>click to re-check</button> and give permission to access your location when prompted. <br />Having trouble enabling your device for geolocation? <a class='thickbox' href='" . $api->assets_url . "/html/location_instructions.html'>Here are instructions.</a> ";
     } else {
       $location_string .= ". If this is not correct, <button class='retryDMALocation'>click to re-check your location</button>"; 
     }
