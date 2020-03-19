@@ -51,7 +51,7 @@ jQuery(document).ready(function($) {
   function playCustomHLSIfPresent(parentdiv) {
     if (typeof($('#custom_hls_player', parentdiv)) !== 'undefined') {
       hlsplayer = $('#custom_hls_player', playerdiv);
-      jwplayer("custom_hls_player").setup({'file': hlsplayer.data('hls'), width: '100%', image: thumb});
+      jwplayer("custom_hls_player").setup({'file': hlsplayer.data('hls'), width: '100%', image: thumb, ga: {label: 'mediaid'}});
     }
   }
 
