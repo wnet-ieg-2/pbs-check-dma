@@ -29,12 +29,14 @@ jQuery(document).ready(function($) {
            * if we haven't satisfied the location requirement yet. 
            * undefined means we dont need to know anymore  */
           playerdiv.html(response.output);
+          $('.retryDMALocation').on("click", resetDMA );
           playCustomHLSIfPresent(playerdiv);
         } else {
           if (!navigator.geolocation || declined_location) {
             /* still possibly to have a playable video:
              *  maybe IP geolcation worked, maybe it didnt */
             playerdiv.html(response.output);
+            $('.retryDMALocation').on("click", resetDMA );
             playCustomHLSIfPresent(playerdiv);
           } else {
             navigator.geolocation.getCurrentPosition(function(position) {
@@ -60,6 +62,12 @@ jQuery(document).ready(function($) {
       declined_location = true; 
     } 
     DMARestrictedPlayer(playerdiv);
+  }
+
+  function resetDMA(evt) {
+    evt.preventDefault;
+    document.cookie = "dmalocation= ;  expires = Thu, 01 Jan 1970 00:00:00 GMT; path=/ ";
+    setTimeout("location.reload(true);", 500);
   }
 
   var declined_location = false;

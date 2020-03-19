@@ -107,9 +107,9 @@ if (empty($_POST['media_id'])) {
     $thumbnail = !empty($_POST['thumbnail']) ? $_POST['thumbnail'] : $api->assets_url . 'img/mezz-default.gif';
 
     if (isset($location['declined_location'])) {
-      $location_string .= ". If that is not correct, we can get more accurate data if you allow us to access your location when prompted.";
+      $location_string .= ". If this location is not correct, please <button class='retryDMALocation'>click to re-check</button> and give permission to access your location when prompted. <br />Having trouble enabling your device for geolocation? <a href='https://www.gps-coordinates.net/geolocation' target=_new>Here are instructions for all browsers and devices.</a> ";
     } else {
-      $location_string .= ". If this is not correct, it may be due to VPN software that may be installed on your device, or mis-reporting of your location by your internet or cable provider."; 
+      $location_string .= ". If this is not correct, <button class='retryDMALocation'>click to re-check your location</button>"; 
     }
     $return["output"] = "<div class='video-wrap dma-fail'><img src='$thumbnail'><div class='sorry'><div class='sorry-txt'><h3>Sorry, this content is only available to viewers within our broadcast area*.</h3><p>Check your <a href='https://www.pbs.org/tv_schedules/' target='_blank'>local PBS listings</a> to find out where you can watch.</p><p>*Our broadcast area contains the following counties:  $allowed_counties_string.</p><p>Your device appears to be located in $location_string</p></div></div></div>";
   }
