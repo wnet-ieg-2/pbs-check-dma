@@ -107,9 +107,9 @@ if (empty($_POST['media_id'])) {
     $thumbnail = !empty($_POST['thumbnail']) ? $_POST['thumbnail'] : $api->assets_url . '/img/mezz-default.gif';
 
     if (isset($location['declined_location'])) {
-      $location_string .= ". If this location is not correct, please <button class='retryDMALocation'>click to re-check</button> and give permission to access your location when prompted. <br />Having trouble enabling your device for geolocation? <a class='thickbox' href='" . $api->assets_url . "/html/location_instructions.html'>Here are instructions.</a> ";
+      $location_string .= ". If this location is not correct, please re-check and give permission to access your location when prompted.<br /><br /><button class='retryDMALocation'>Re-check location <i class='fa fa-map-marker'></i> </button><br /><br />Having trouble enabling your device for geolocation? <br /><a class='thickbox' href='" . $api->assets_url . "/html/location_instructions.html'>Here are instructions.</a> ";
     } else {
-      $location_string .= ". If this is not correct, <button class='retryDMALocation'>click to re-check your location</button>"; 
+      $location_string .= ". If this is not correct, <br /><br /><button class='retryDMALocation'>Re-check location <i class='fa fa-map-marker'></i> </button>"; 
     }
     $return["output"] = "<div class='video-wrap dma-fail'><img src='$thumbnail'><div class='sorry'><div class='sorry-txt'><h3>Sorry, this content is only available to viewers within our broadcast area*.</h3><p>Check your <a href='https://www.pbs.org/tv_schedules/' target='_blank'>local PBS listings</a> to find out where you can watch.</p><p>*Our broadcast area contains the following counties:  $allowed_counties_string.</p><p>Your device appears to be located in $location_string</p></div></div></div>";
   }

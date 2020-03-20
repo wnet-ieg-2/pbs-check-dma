@@ -1,10 +1,21 @@
 .video-wrap.dma-fail {padding: 0;}
 .video-wrap.dma-fail img {position: relative;}
 .video-wrap.dma-fail .sorry {position: absolute; top: 0; left: 0; width: 45%; height: 100%; background: rgba(0, 0, 0, 0.6);}
-.video-wrap.dma-fail .sorry a {color: #fff; text-decoration: underline;}
+.video-wrap.dma-fail .sorry a {color: #fff; text-decoration: underline; font-weight: bold;}
 .video-wrap.dma-fail h3 { font-family: 'Montserrat'; font-size: 1.4em; margin: 0;}
 .video-wrap.dma-fail .sorry-txt { top: 50%; transform: translate(0, -50%); position: absolute; width: 100%; padding: 0 1.5em;}
-.video-wrap.dma-fail .sorry p {font-size: 1em; line-height: 1.1em;}
+.video-wrap.dma-fail .sorry p {font-family: 'Montserrat'; font-size: .8em; line-height: 1.2em;}
+
+.video-wrap.dma-fail button {
+	background-color: #008CB6;
+	border: 0;
+	color: #fff;
+	font-size: 1em;
+	font-weight: 600;
+	padding: .6em 1em;
+	text-align: center;
+	text-transform: uppercase;
+}
 
 body .pbs-check-dma-modal {
   font: normal 100% 'Montserrat';
@@ -92,7 +103,7 @@ body .pbs-check-dma-modal .responseArea p span {
 
 @media screen and ( max-width: 480px ) {
     .video-wrap.dma-fail .sorry h3 {font-size: .8em;}
-    .video-wrap.dma-fail .sorry p {font-size: .75em; line-height: 1em;}
+    .video-wrap.dma-fail .sorry p {font-size: .70em; line-height: 1em;}
 }
 @media screen and ( min-width: 481px ) and ( max-width: 665px ) {
     .video-wrap.dma-fail .sorry p {font-size: .85em;}
