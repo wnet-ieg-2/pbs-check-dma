@@ -2,7 +2,13 @@
 <head>
 <title>Managing Geolocation In Your Browser</title>
 </head>
-<body>
+<body id=geolocation>
+<style>
+body#geolocation {color: #000; }
+img {display: inline;}
+ul li {list-style-type: disc; margin-left: 1em;}
+</style>
+
 <h2>Managing Geolocation In Your Browser</h2>
 <p>Once you've declined giving access to your location to a web page, re-enabling your browser to know where you are physically located requires you to manually give that permission.  Every browser has a different means for you to give that permission.</p>
 <ul>
@@ -14,18 +20,36 @@
 </ul>
 
 <h3 id="chrome">Google Chrome</h3>
-<p>Chrome is the most widely installed browser, and is available on Windows, Mac, Android, and iPhone/iPad.  In the address bar, click on the Lock or Bullseye icons.  From the Lock icon, change the Location permission to Allow or Ask; or if you clicked on the Bullseye icon, you'll see a list of sites that have been blocked from tracking your location -- click "clear these settings for future visits".</p>
+<p>Chrome is the most widely installed browser, and is available on Windows, Mac, Android, and iPhone/iPad.  In the address bar, click on the <img src="/wp-content/plugins/pbs-check-dma/assets/img/browser-lock.png" alt="lock icon" /> Lock or <img src="/wp-content/plugins/pbs-check-dma/assets/img/bullseye-blocked.png" alt="bullseye icon, with block indidation" /> Bullseye icons.  From the Lock icon, change the Location permission to Allow or Ask; or if you clicked on the Bullseye icon, you'll see a list of sites that have been blocked from tracking your location -- click "clear these settings for future visits".</p>
 
 <h3 id="edge">Microsoft Edge</h3>
-<p>Edge is the default browser installed on Windows 10.  In the corner of the address bar, select the Lock  , Info , or Dangerous  icon and select Site permissions.  Next to Location, choose Ask (default), Allow, or Block from the list.
+<p>Edge is the default browser installed on Windows 10.  
+<ul><li>If you were already prompted to allow sharing your location but you declined, In the corner of the address bar, select the <img src="/wp-content/plugins/pbs-check-dma/assets/img/browser-lock.png" alt="lock icon" /> Lock icon and select Site permissions.  Next to Location, choose "Ask" or "Allow".
+</li>
+<li>If you were not prompted, you may need to enable location sharing for your PC. On your PC, click the Windows Start button
+    <br />Go to Settings > Privacy > Location
+    <br />Scroll down to Choose apps that can use your precise location
+    <br />Make sure Edge is selected from the list
+</li></ul>
+
 </p>
 
 <h3 id="firefox">Firefox</h3>
-<p>Firefox is a popular open-source browser.   In the location bar, select the Lock or Location icon, look in the Permissions section, and allow Location access.</p>
+<p>Firefox is a popular open-source browser.   In the location bar, select the <img src="/wp-content/plugins/pbs-check-dma/assets/img/browser-lock.png" alt="lock icon" /> Lock or <img src="/wp-content/plugins/pbs-check-dma/assets/img/bullseye-blocked.png" alt="bullseye icon, with block indidation" /> Location icon, look in the Permissions section, and allow Location access.</p>
 
 <h3 id="safari">Apple Safari</h3>
-<p>Safari is the default browser installed on Mac, iPhone, and iPad.  From the Safari menu (next to the Apple menu), choose Settings for This Website.  
-A pop-over should appear, with a Location setting at the bottom.</p>
+<p>Safari is the default browser installed on Mac, iPhone, and iPad.  
+<ul><li>From the Safari menu (next to the Apple menu), choose Settings for This Website. <br />
+<img src="/wp-content/plugins/pbs-check-dma/assets/img/safari_menu.png" alt="Safari menu choices" />  
+A pop-over should appear, with a Location setting at the bottom. Change that setting to "Ask" or "Allow".</li>
+<li>If you don't see that Location setting, you may need to enable location sharing on your Mac.    Click on the Apple menu at the top left corner of your Mac
+    <br />Select System Preferences
+    <br />Click the Security & Privacy icon in the System Preferences window
+    <br />Click the Privacy tab (you may need unlock the padlock icon by entering your admin name and password)
+    <br />Select Location Services
+    <br />Check the Enable Location Services box and make sure Safari is selected from the list
+</li>
+</ul></p>
 
 <h3 id="others">All others</h3>
 <p>There are many different versions of the above browsers and there is no real standard means to allow location access for a website after you've blocked it.  Usually there will be some sort of Lock or Info icon available in the address/location bar, or as a menu item labeled Page Info or similar.</p>
