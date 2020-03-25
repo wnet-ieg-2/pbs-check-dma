@@ -30,14 +30,14 @@ jQuery(document).ready(function($) {
            * undefined means we dont need to know anymore  */
           playerdiv.html(response.output);
           $('.retryDMALocation').on("click", resetDMA );
-          playCustomHLSIfPresent(playerdiv);
+          playCustomHLSIfPresent();
         } else {
           if (!navigator.geolocation || declined_location) {
             /* still possibly to have a playable video:
              *  maybe IP geolcation worked, maybe it didnt */
             playerdiv.html(response.output);
             $('.retryDMALocation').on("click", resetDMA );
-            playCustomHLSIfPresent(playerdiv);
+            playCustomHLSIfPresent();
           } else {
             navigator.geolocation.getCurrentPosition(function(position) {
               browser_lat = position.coords.latitude;
@@ -50,10 +50,39 @@ jQuery(document).ready(function($) {
     });
   }
 
-  function playCustomHLSIfPresent(parentdiv) {
-    if (typeof($('#custom_hls_player', parentdiv)) !== 'undefined') {
-      hlsplayer = $('#custom_hls_player', playerdiv);
-      jwplayer("custom_hls_player").setup({'file': hlsplayer.data('hls'), width: '100%', image: thumb, ga: {label: 'mediaid'}});
+  function playCustomHLSIfPresent() {
+    if (typeof($('#custom_hls_player')) !== 'undefined') {
+      var payload = {timestamp:Date.now()};
+      $.ajax(
+        {
+          url: "/livestream_status/",
+          data: payload,
+          type: 'POST',
+          dataType: 'json'
+        }
+      )
+      .done(function(response) {
+        if (typeof(response.blackout_status) !== 'undefined') {
+          player = $('#custom_hls_player');
+          if (typeof(player.data('hls') !== 'undefined') && player.data('hls')) {
+            hls = player.data('hls');
+          }
+          blackout_status = response.blackout_status;
+          console.log("stream blacked out: " + blackout_status);
+          if (blackout_status == false) {
+            if (typeof(jwplayer("custom_hls_player").getState()) === 'undefined') {
+              jwplayer("custom_hls_player").setup({'file': hls, width: '100%', image: thumb, ga: {label: 'mediaid'}});
+            }
+          } else {
+            if (typeof(jwplayer("custom_hls_player")) !== 'undefined') {
+              jwplayer("custom_hls_player").remove();
+            }
+          }
+        }
+      })
+      .always(function() {
+        blackoutStatusTimeout = window.setTimeout(playCustomHLSIfPresent, 60*1000);
+      });
     }
   }
 
@@ -70,11 +99,44 @@ jQuery(document).ready(function($) {
     setTimeout("location.reload(true);", 500);
   }
 
+  var blackout_status = false;
+  var blackoutStatusTimeout = false;
+
+  function checkBlackoutStatus() {
+    var payload = {timestamp:Date.now()};
+    $.ajax(
+      {
+        url: "/livestream_status/",
+        data: payload,
+        type: 'POST',
+        dataType: 'json'
+      }
+    )
+    .done(function(response) {
+      if (typeof(response.blackout_status) !== 'undefined') {
+        blackout_status = response.blackout_status;
+        console.log(blackout_status);
+      } 
+    })
+    .always(function() {
+      blackoutStatusTimeout = window.setTimeout(checkBlackoutStatus, 60*1000);
+    });
+  }
+  //checkBlackoutStatus();
+
+
+
+
+
+
+
+
   var declined_location = false;
   var playerdiv = '';
   var browser_lat = '';
   var browser_long = '';
   var thumb = '';
+  var hls = '';
 
   if ($(".dmarestrictedplayer[data-media]")[0]){
     $( ".dmarestrictedplayer" ).each(function( index ) {
