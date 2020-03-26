@@ -101,36 +101,6 @@ jQuery(document).ready(function($) {
 
   var blackout_status = false;
   var blackoutStatusTimeout = false;
-
-  function checkBlackoutStatus() {
-    var payload = {timestamp:Date.now()};
-    $.ajax(
-      {
-        url: "/livestream_status/",
-        data: payload,
-        type: 'POST',
-        dataType: 'json'
-      }
-    )
-    .done(function(response) {
-      if (typeof(response.blackout_status) !== 'undefined') {
-        blackout_status = response.blackout_status;
-        console.log(blackout_status);
-      } 
-    })
-    .always(function() {
-      blackoutStatusTimeout = window.setTimeout(checkBlackoutStatus, 60*1000);
-    });
-  }
-  //checkBlackoutStatus();
-
-
-
-
-
-
-
-
   var declined_location = false;
   var playerdiv = '';
   var browser_lat = '';
