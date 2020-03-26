@@ -1,6 +1,6 @@
 # PBS Check DMA
 
-PBS Check DMA is a WordPress plugin that geo-filters specific PBS-hosted videos to visitors who are physically located within the DMA of a PBS station. 
+PBS Check DMA is a WordPress plugin that geo-filters video content to visitors who are physically located within the DMA (Designated Marketing Area) of a local PBS station. 
 
 
 ## Contents
@@ -30,9 +30,15 @@ By default the plugin only checks against the PBS Localization API, which uses I
 
 Selecting a Reverse GeoCoding Provider allows the use of the much more accurate 'device location API' that takes advantage of things like GPS etc. This is much better for mobile devices particularly, but all devices with a web browser will have improved results. The device returns a latitude/longitude, which then is sent to a reverse geocoding service to be converted into a info like 'county' and 'zip'. That's not exactly free: all of the providers require signup; most have a 'free' tier (here.com is 250k requests/month, googlemaps is 40k requests/month).
 
-## Theme Integration
+Custom HLS streams can be supported by entering a URL for the JW Player libraries.  See jwplayer.com for details.
 
-After activating the plugin, wherever you want to render a DMA restricted video create an instance of the PBS_Check_DMA class -- eg
+## Custom HLS and Shortcode
+
+The plugin creates a meta box on "page" type posts, where URLs for a stream and a mezzanine (16x9) image can be entered.  Entering those fields enables a shortcode that can be placed in any post or page to render either the video player specified for that stream or, if the visitor is outside of geofenced region, language explaining that why the visitor is blocked.
+
+## Theme Integration for PBS-hosted videos
+
+After activating the plugin, wherever you want to render a PBS-hosted but DMA-restricted video create an instance of the PBS_Check_DMA class -- eg
 
 ```php
 $checkdma = new PBS_Check_DMA();
@@ -40,7 +46,7 @@ $player = $checkdma->build_dma_restricted_player(sometpmediaid, url_for_a_mezz_i
 echo $player;
 ```
 
-("sometpmediaid" would be something like '92424242410', you'd get that from the Media Manager; and "url_for_a_mezz_image" would look something like 'https://image.pbs.org/video-assets/AIdcUYK-asset-mezzanine-16x9-ccRViYN.jpg')
+("sometpmediaid" would be something like '92424242410', you'd get that from the PBS Media Manager; and "url_for_a_mezz_image" would look something like 'https://image.pbs.org/video-assets/AIdcUYK-asset-mezzanine-16x9-ccRViYN.jpg')
 
 That will write out a DIV with the class 'dmarestrictedplayer' that will enclose a thumbnail image sized to 1200x675. That will also automatically enqueue appropriate javascript and CSS on the page to act on any div with that class. The javascript will then act on that class to look up the location of your visitor, compare it to the list of allowed counties, and if a match is found write out a PBS 'Partner Player' using the supplied TP Media Object ID.
 
@@ -55,8 +61,10 @@ and manually write out that DIV with a 'data-media' property with the value bein
 
 ## Changelog
 
-* 0.1 2017-07-18 Initial base code
+* 0.6 2020-03-20 Shortcode that JW Player integration for custom streams 
 * 0.4 2018-11-29 Complete revamp 
+* 0.1 2017-07-18 Initial base code
+
 
 ## License
 
