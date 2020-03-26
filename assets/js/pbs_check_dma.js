@@ -16,6 +16,7 @@ jQuery(document).ready(function($) {
     }
     if (typeof(playerdiv.data('postid')) !== 'undefined') {
       postdata["postid"] = playerdiv.data('postid');
+      postid = postdata["postid"];
     }
 
     $.ajax({
@@ -52,7 +53,15 @@ jQuery(document).ready(function($) {
 
   function playCustomHLSIfPresent() {
     if (typeof($('#custom_hls_player')) !== 'undefined') {
-      var payload = {timestamp:Date.now()};
+      player = $('#custom_hls_player');
+      if (typeof(player.data('postid') !== 'undefined') && player.data('postid')) {
+        postid = player.data('postid');
+      }
+      if (typeof(player.data('hls') !== 'undefined') && player.data('hls')) {
+        hls = player.data('hls');
+      }
+
+      var payload = {'postid':postid,'timestamp':Date.now()};
       $.ajax(
         {
           url: "/livestream_status/",
@@ -63,10 +72,6 @@ jQuery(document).ready(function($) {
       )
       .done(function(response) {
         if (typeof(response.blackout_status) !== 'undefined') {
-          player = $('#custom_hls_player');
-          if (typeof(player.data('hls') !== 'undefined') && player.data('hls')) {
-            hls = player.data('hls');
-          }
           blackout_status = response.blackout_status;
           console.log("stream blacked out: " + blackout_status);
           if (blackout_status == false) {
@@ -76,6 +81,7 @@ jQuery(document).ready(function($) {
           } else {
             if (typeof(jwplayer("custom_hls_player")) !== 'undefined') {
               jwplayer("custom_hls_player").remove();
+              player.parent(".dmarestrictedplayer").html("<div id='custom_hls_player'><div class='video-wrap dma-fail'><img src='" + thumb + "'><div class='sorry'><div class='sorry-txt'><h3>The currently-broadcast program is not licensed for live streaming. <br />The live stream will resume at " + response.end + "</h3></div></div></div></div>");
             }
           }
         }
@@ -107,6 +113,7 @@ jQuery(document).ready(function($) {
   var browser_long = '';
   var thumb = '';
   var hls = '';
+  var postid = '';
 
   if ($(".dmarestrictedplayer[data-media]")[0]){
     $( ".dmarestrictedplayer" ).each(function( index ) {
