@@ -27,6 +27,9 @@ $blackout_status = array(
 );
 
 foreach ($blackout_schedule as $type => $data) {
+  if (empty($data)) {
+    continue;
+  }
   foreach($data as $schedule => $times) {
     if ($type == 'weekly') {
       if (strtolower($schedule) != strtolower($dayname)) {
