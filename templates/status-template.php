@@ -18,7 +18,7 @@ if (!empty($_POST['postid'])) {
 $tz = !empty(get_option('timezone_string')) ? get_option('timezone_string') : 'America/New York';
 $date = new DateTime('now', new DateTimeZone($tz));
 
-$dayname = $date->format('D');
+$dayname = $date->format('l');
 $ymd = $date->format('Y-m-d');
 $miltime = $date->format('Hi');
 
