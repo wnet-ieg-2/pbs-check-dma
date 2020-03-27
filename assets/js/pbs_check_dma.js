@@ -52,17 +52,23 @@ jQuery(document).ready(function($) {
   }
 
   function playCustomHLSIfPresent() {
-    if (typeof($('#custom_hls_player')) !== 'undefined') {
-      player = $('#custom_hls_player');
-      if (typeof(player.data('postid') !== 'undefined') && player.data('postid')) {
-        postid = player.data('postid');
-      }
-      if (typeof(player.data('hls') !== 'undefined') && player.data('hls')) {
-        hls = player.data('hls');
-      }
-
-      var payload = {'postid':postid,'timestamp':Date.now()};
-      $.ajax(
+    if (typeof($('#custom_hls_player')) === 'undefined') {
+      // this script doesnt apply so be done.
+      return;
+    }
+    var player = $('#custom_hls_player');
+    if (typeof(player.data('postid') !== 'undefined') && player.data('postid')) {
+      postid = player.data('postid');
+    }
+    if (typeof(player.data('hls') !== 'undefined') && player.data('hls')) {
+      hls = player.data('hls');
+    }
+    var playerargs = {'file': hls, width: '100%', image: thumb };
+    if (typeof(userstarted) !== 'undefined'){
+      playerargs['autostart'] = userstarted;
+    } 
+    var payload = {'postid':postid,'timestamp':Date.now()};
+    $.ajax(
         {
           url: "/livestream_status/",
           data: payload,
@@ -76,7 +82,7 @@ jQuery(document).ready(function($) {
           console.log("stream blacked out: " + blackout_status);
           if (blackout_status == false) {
             if (typeof(jwplayer("custom_hls_player").getState()) === 'undefined') {
-              jwplayer("custom_hls_player").setup({'file': hls, width: '100%', image: thumb });
+              jwplayer("custom_hls_player").setup(playerargs).on('error', jwperrorhandler).on('play', function() {userstarted = true; console.log("user started");});
             }
           } else {
             if (typeof(jwplayer("custom_hls_player")) !== 'undefined') {
@@ -114,6 +120,7 @@ jQuery(document).ready(function($) {
   var thumb = '';
   var hls = '';
   var postid = '';
+  var userstarted = false;
 
   if ($(".dmarestrictedplayer[data-media]")[0]){
     $( ".dmarestrictedplayer" ).each(function( index ) {
