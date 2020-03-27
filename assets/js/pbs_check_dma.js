@@ -76,7 +76,7 @@ jQuery(document).ready(function($) {
           console.log("stream blacked out: " + blackout_status);
           if (blackout_status == false) {
             if (typeof(jwplayer("custom_hls_player").getState()) === 'undefined') {
-              jwplayer("custom_hls_player").setup({'file': hls, width: '100%', image: thumb, ga: {label: 'mediaid'}});
+              jwplayer("custom_hls_player").setup({'file': hls, width: '100%', image: thumb });
             }
           } else {
             if (typeof(jwplayer("custom_hls_player")) !== 'undefined') {
