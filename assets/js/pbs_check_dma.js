@@ -86,8 +86,9 @@ jQuery(document).ready(function($) {
             }
           } else {
             if (typeof(jwplayer("custom_hls_player")) !== 'undefined') {
+              jwplayer("custom_hls_player").stop();
               jwplayer("custom_hls_player").remove();
-              player.parent(".dmarestrictedplayer").html("<div id='custom_hls_player'><div class='video-wrap dma-fail'><img src='" + thumb + "'><div class='sorry'><div class='sorry-txt'><h3>The currently-broadcast program is not licensed for live streaming. <br />The live stream will resume at " + response.end + "</h3></div></div></div></div>");
+              $(".dmarestrictedplayer").html("<div id='custom_hls_player'><div class='video-wrap dma-fail'><img src='" + thumb + "'><div class='sorry'><div class='sorry-txt'><h3>The currently-broadcast program is not licensed for live streaming. <br />The live stream will resume at " + response.end + "</h3></div></div></div></div>");
             }
           }
         }
@@ -95,7 +96,11 @@ jQuery(document).ready(function($) {
       .always(function() {
         blackoutStatusTimeout = window.setTimeout(playCustomHLSIfPresent, 30*1000);
       });
-    }
+  }
+
+  function jwperrorhandler() {
+      jwplayer("custom_hls_player").remove();
+      $(".dmarestrictedplayer").html("<div id='custom_hls_player'><div class='video-wrap dma-fail'><img src='" + thumb + "'><div class='sorry'><div class='sorry-txt'><h3>One moment please, there is a problem with the livestream</h3></div></div></div></div>");
   }
 
   function geoerrorhandler(error) {
