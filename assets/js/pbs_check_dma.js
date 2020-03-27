@@ -87,7 +87,7 @@ jQuery(document).ready(function($) {
         }
       })
       .always(function() {
-        blackoutStatusTimeout = window.setTimeout(playCustomHLSIfPresent, 60*1000);
+        blackoutStatusTimeout = window.setTimeout(playCustomHLSIfPresent, 30*1000);
       });
     }
   }
