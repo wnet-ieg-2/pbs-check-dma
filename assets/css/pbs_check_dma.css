@@ -1,4 +1,4 @@
-.video-wrap.dma-fail {padding: 0;}
+.video-wrap.dma-fail {padding: 0; color: #fff;}
 .video-wrap.dma-fail img {position: relative;}
 .video-wrap.dma-fail .sorry {position: absolute; top: 0; left: 0; width: 45%; height: 100%; background: rgba(0, 0, 0, 0.6);}
 .video-wrap.dma-fail .sorry a {color: #fff; text-decoration: underline; font-weight: bold;}
