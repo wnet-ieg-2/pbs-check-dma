@@ -42,7 +42,7 @@ foreach ($blackout_schedule as $type => $data) {
     }
     if (!empty($times)) {
       foreach ($times as $time => $pair) {
-        if ($miltime > (int) $pair['start'] && $miltime < (int) $pair['end']) {
+        if ($miltime >= (int) $pair['start'] && $miltime <= (int) $pair['end']) {
           $blackout_status["blackout_status"] = true;
           $hours = substr($pair['end'], 0, 2);
           $minutes = substr($pair['end'], 2, 2);
