@@ -17,7 +17,7 @@ class PBS_Check_DMA {
 		$this->assets_dir = trailingslashit( $this->dir ) . 'assets';
 		$this->assets_url = trailingslashit(plugin_dir_url( __DIR__ ) ) . 'assets';
     $this->token = 'pbs_check_dma';
-    $this->version = '0.71';
+    $this->version = '0.73';
 
 		// Load public-facing style sheet and JavaScript.
 		//add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -269,7 +269,7 @@ class PBS_Check_DMA {
         $mezz_image = $postmeta['dma_restricted_video_image'][0];
       }
       $return = '<div class="dmarestrictedplayer program-player" data-media="custom_hls" data-postid="' . $post_id . '"><img src="'.$mezz_image.'" /></div>';
-      $return .= "<link rel=stylesheet media='all' type='text/css' href='" . $this->assets_url . "/css/pbs_check_dma.css' /><script src='$jwplayer_uri'></script><script src='" . $this->assets_url . "/js/pbs_check_dma.js'></script>";
+      $return .= "<link rel=stylesheet media='all' type='text/css' href='" . $this->assets_url . "/css/pbs_check_dma.css?version=" . $this->version . "' /><script src='$jwplayer_uri'></script><script src='" . $this->assets_url . "/js/pbs_check_dma.js?version=" . $this->version . "'></script>";
      }
     return $return;
   }
