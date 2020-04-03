@@ -82,7 +82,7 @@ jQuery(document).ready(function($) {
           console.log("stream blacked out: " + blackout_status);
           if (blackout_status == false) {
             if (typeof(jwplayer("custom_hls_player").getState()) === 'undefined') {
-              jwplayer("custom_hls_player").setup(playerargs).on('error', jwperrorhandler).on('play', function() {userstarted = true; console.log("user started");});
+              jwplayer("custom_hls_player").setup(playerargs).on('error', jwperrorhandler).on('play', function() {userstarted = true; console.log("user started"); jwResetUnknownCC(); }).on('captionsList', jwResetUnknownCC);
             }
           } else {
             if (typeof(jwplayer("custom_hls_player")) !== 'undefined') {
@@ -101,6 +101,14 @@ jQuery(document).ready(function($) {
   function jwperrorhandler() {
       jwplayer("custom_hls_player").remove();
       $(".dmarestrictedplayer").html("<div id='custom_hls_player'><div class='video-wrap dma-fail'><img src='" + thumb + "'><div class='sorry'><div class='sorry-txt'><h3>One moment please, there is a problem with the livestream</h3></div></div></div></div>");
+  }
+
+  function jwResetUnknownCC () {
+    $("#jw-settings-submenu-captions button").each(function() {
+      if ($(this).text() == "Unknown CC") {
+        $(this).text("English");
+      }
+    });
   }
 
   function geoerrorhandler(error) {
