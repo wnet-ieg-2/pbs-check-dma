@@ -66,8 +66,10 @@ jQuery(document).ready(function($) {
     var playerargs = {'file': hls, width: '100%', image: thumb };
     if (typeof(userstarted) !== 'undefined'){
       playerargs['autostart'] = userstarted;
-    } 
-    var payload = {'postid':postid,'timestamp':Date.now()};
+    }
+    var timestamp = new Date(Date.now());
+    var nicedate = timestamp.getUTCFullYear() + '-' + timestamp.getUTCMonth() + '-' + timestamp.getUTCDate() + '-' + timestamp.getUTCHours() + ':' + timestamp.getUTCMinutes();
+    var payload = {'postid':postid,'timestamp':nicedate};
     $.ajax(
         {
           url: "/livestream_status/",
