@@ -10,8 +10,8 @@ $defaults = get_option('pbs_check_dma');
 $station_common_name = !empty($defaults['station_common_name']) ? $defaults['station_common_name'] : "";
 $blackout_schedule = array();
 
-if (!empty($_POST['postid'])) {
-  $postid = $_POST['postid'];
+if (!empty($_REQUEST['postid'])) {
+  $postid = $_REQUEST['postid'];
   $transient_name = 'pbs_check_dma_blackout_status_' . $postid;
   // Get any existing copy of our transient data
   if ( false === ( $postmeta_data = get_transient( $transient_name ) ) ) {

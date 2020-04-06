@@ -72,7 +72,7 @@ jQuery(document).ready(function($) {
         {
           url: "/livestream_status/",
           data: payload,
-          type: 'POST',
+          type: 'GET',
           dataType: 'json'
         }
       )
