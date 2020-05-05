@@ -60,7 +60,9 @@ $checkdma->enqueue_scripts();
 and manually write out that DIV with a 'data-media' property with the value being the desired TP Media Object ID, enclosing the appropriate thumb image of your choice. 
 
 ## Changelog
+This is somewhat incomplete, but currently up-to-date
 
+* 0.78 2020-05-05 Prevent livestream_status endpoint being requested when it doesn't apply
 * 0.6 2020-03-20 Shortcode that JW Player integration for custom streams 
 * 0.4 2018-11-29 Complete revamp 
 * 0.1 2017-07-18 Initial base code

@@ -52,7 +52,7 @@ jQuery(document).ready(function($) {
   }
 
   function playCustomHLSIfPresent() {
-    if (typeof($('#custom_hls_player')) === 'undefined') {
+    if ($('#custom_hls_player').length == 0) {
       // this script doesnt apply so be done.
       return;
     }
