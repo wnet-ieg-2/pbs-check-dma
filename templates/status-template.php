@@ -5,7 +5,7 @@ remove_all_actions('wp_footer',1);
 remove_all_actions('wp_header',1);
 
 $return = array();
-
+/*
 $defaults = get_option('pbs_check_dma');
 $station_common_name = !empty($defaults['station_common_name']) ? $defaults['station_common_name'] : "";
 $blackout_schedule = array();
@@ -65,6 +65,11 @@ if (!empty($_REQUEST['postid'])) {
   }
   $return = $blackout_status;
 }
+*/
+
+  $return = array(
+    "blackout_status" => false
+  );
 
 // extra slash stripping in case we're using PHP 5.3
 $json = stripslashes(json_encode($return));
