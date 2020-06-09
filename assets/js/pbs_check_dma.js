@@ -67,42 +67,14 @@ jQuery(document).ready(function($) {
     if (typeof(userstarted) !== 'undefined'){
       playerargs['autostart'] = userstarted;
     }
-    var timestamp = new Date(Date.now());
-    var nicedate = timestamp.getUTCFullYear() + '-' + timestamp.getUTCMonth() + '-' + timestamp.getUTCDate() + '-' + timestamp.getUTCHours() + ':' + timestamp.getUTCMinutes();
-    var payload = {'postid':postid,'timestamp':nicedate};
-    $.ajax(
-        {
-          url: "/livestream_status/",
-          data: payload,
-          type: 'GET',
-          dataType: 'json'
-        }
-      )
-      .done(function(response) {
-        if (typeof(response.blackout_status) !== 'undefined') {
-          blackout_status = response.blackout_status;
-          console.log("stream blacked out: " + blackout_status);
-          if (blackout_status == false) {
-            if (typeof(jwplayer("custom_hls_player").getState()) === 'undefined') {
-              jwplayer("custom_hls_player").setup(playerargs).on('error', jwperrorhandler).on('play', function() {userstarted = true; console.log("user started"); jwResetUnknownCC(); }).on('captionsList', jwResetUnknownCC);
-            }
-          } else {
-            if (typeof(jwplayer("custom_hls_player")) !== 'undefined') {
-              jwplayer("custom_hls_player").stop();
-              jwplayer("custom_hls_player").remove();
-              $(".dmarestrictedplayer").html("<div id='custom_hls_player'><div class='video-wrap dma-fail'><img src='" + thumb + "'><div class='sorry'><div class='sorry-txt'><h3>The currently-broadcast program is not licensed for live streaming.</h3><br /><br /><h3>The live stream will resume at " + response.end + "</h3></div></div></div></div>");
-            }
-          }
-        }
-      })
-      .always(function() {
-        blackoutStatusTimeout = window.setTimeout(playCustomHLSIfPresent, 60*1000);
-      });
+    if (typeof(jwplayer("custom_hls_player").getState()) === 'undefined') {
+      jwplayer("custom_hls_player").setup(playerargs).on('error', jwperrorhandler).on('play', function() {userstarted = true; console.log("user started"); jwResetUnknownCC(); }).on('captionsList', jwResetUnknownCC);
+    }
   }
 
   function jwperrorhandler() {
-      jwplayer("custom_hls_player").remove();
-      $(".dmarestrictedplayer").html("<div id='custom_hls_player'><div class='video-wrap dma-fail'><img src='" + thumb + "'><div class='sorry'><div class='sorry-txt'><h3>One moment please, there is a problem with the livestream</h3></div></div></div></div>");
+    jwplayer("custom_hls_player").remove();
+    $(".dmarestrictedplayer").html("<div id='custom_hls_player'><div class='video-wrap dma-fail'><img src='" + thumb + "'><div class='sorry'><div class='sorry-txt'><h3>One moment please, there is a problem with the livestream</h3></div></div></div></div>");
   }
 
   function jwResetUnknownCC () {
@@ -126,8 +98,6 @@ jQuery(document).ready(function($) {
     setTimeout("location.reload(true);", 500);
   }
 
-  var blackout_status = false;
-  var blackoutStatusTimeout = false;
   var declined_location = false;
   var playerdiv = '';
   var browser_lat = '';
@@ -142,7 +112,5 @@ jQuery(document).ready(function($) {
         DMARestrictedPlayer(this, '','');
     });
   }
-
-
 });
 
