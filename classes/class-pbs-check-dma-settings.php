@@ -211,12 +211,6 @@ and manually write out that DIV with a 'data-media' property with the value bein
       $html .= '<label for="dma_restricted_video_image">Preview image</label><div class="description"><i>URI for 16x9 mezz image for vid preview</i></div>';
       $html .= '<input type="text" name="dma_restricted_video_image" id="dma_restricted_video_image" class="regular-text" value = ' . $vid_image . '><button class="upload-image button-primary" data-field="dma_restricted_video_image"><span class="dashicons dashicons-camera"></span></button><br />';
       $html .= "<p class='description'>You can make the DMA restricted player with the video and image above display by adding the shortcode <code>[dma_restricted_player]</code> to the content if on this page, or on other posts or pages use <br /><code>[dma_restricted_player post_id=$post_id]</code></p>";
-      $blackouts_weekly = !empty($postmeta_data['dma_restricted_video_blackouts_weekly'][0]) ? stripslashes($postmeta_data['dma_restricted_video_blackouts_weekly'][0]) : '';
-      $html .= '<label for="dma_restricted_video_blackouts_weekly">Weekly blackouts</label><div class="description"><i>JSON array of recurring daily blackouts</i></div>'; 
-      $html .= '<textarea name="dma_restricted_video_blackouts_weekly" id="dma_restricted_video_blackouts_weekly">' . $blackouts_weekly . '</textarea><br />';
-      $blackouts_dates = !empty($postmeta_data['dma_restricted_video_blackouts_dates'][0]) ? stripslashes($postmeta_data['dma_restricted_video_blackouts_dates'][0]) : '';
-      $html .= '<label for="dma_restricted_video_blackouts_dates">Specific blackout datetimes</label><div class="description"><i>JSON array of specific one-off blackouts</i></div>';
-      $html .= '<textarea name="dma_restricted_video_blackouts_dates" id="dma_restricted_video_blackouts_dates">' . $blackouts_dates . '</textarea>';
      
 
 
@@ -258,7 +252,7 @@ EOF;
     if ( ! current_user_can( 'edit_post', $post_id ) ) {
       return $post_id;
     }
-    $fields = array('dma_restricted_video', 'dma_restricted_video_uri', 'dma_restricted_video_image', 'dma_restricted_video_blackouts_weekly', 'dma_restricted_video_blackouts_dates');
+    $fields = array('dma_restricted_video', 'dma_restricted_video_uri', 'dma_restricted_video_image');
     foreach ($fields as $field) {
       $value = isset( $_POST[$field]) ? $_POST[$field] : false;
       if ($value) {
