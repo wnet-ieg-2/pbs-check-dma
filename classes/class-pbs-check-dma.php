@@ -43,20 +43,16 @@ class PBS_Check_DMA {
 
   public function setup_rewrite_rules() {
     add_rewrite_rule( 'pbs_check_dma/?.*$', 'index.php?pbs_check_dma=1', 'top');
-    add_rewrite_rule( 'livestream_status/?.*$', 'index.php?livestream_status=1', 'top');
   }
 
   public function register_query_vars( $vars ) {
     $vars[] = 'pbs_check_dma';
-    $vars[] = 'livestream_status';
     return $vars;
   }
 
   public function use_custom_template($template) {
     if ( get_query_var('pbs_check_dma')==true ) {
       $template = trailingslashit($this->dir) . 'templates/endpoint-template.php' ;
-    } else if ( get_query_var('livestream_status')==true ) {
-      $template = trailingslashit($this->dir) . 'templates/status-template.php' ;
     }
     return $template;
   }
