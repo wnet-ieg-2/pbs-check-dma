@@ -201,6 +201,50 @@ class PBS_Check_DMA {
     return in_array(strtolower($county), array_map('strtolower', $these_counties));
   }
 
+  public function callsign_available_in_zipcode($zipcode, $desired_callsign = '') {
+    /* returns true if callsign is available and a primary in zipcode, otherwise false */
+    if (empty($zipcode) || !(preg_match('/^(\d{5})?$/', $zipcode))) {
+      // zipcode is either empty or isn't 5 digits
+      return false;
+    }
+    if (empty($desired_callsign)) {
+      $defaults = get_option($this->token);
+      $desired_callsign = !empty($defaults['station_call_letters']) ? $defaults['station_call_letters'] : '';
+      if (empty($desired_callsign)) {
+        // configuration error
+        error_log($this->token . " requires station_call_letters to be set, see settings page");
+        return false;
+      }
+    }
+    $callsign_url = "https://services.pbs.org/callsigns/zip/";
+    $combined_url = $callsign_url . $zipcode . '.json';
+    $call_sign = false;
+    $response = wp_remote_get($combined_url, array());
+    if (! is_array( $response ) || empty($response['body'])) {
+      return array('errors' => $response);
+    }
+    $body = $response['body']; // use the content
+    $parsed = json_decode($body, TRUE);
+    foreach($parsed['$items'] as $key) {
+      foreach($key['$links'][0]['$links'] as $link) {
+        if (isset( $link['$links'] )) {
+          foreach($link['$links'] as $i) {
+            if($i['$relationship'] == "flagship"){
+              if(  $key['confidence'] == 100 AND ( $key['rank'] == 1 OR !isset($key['rank']) )  ){
+                $call_sign = $key['$links'][0]['callsign'];
+                if ( $call_sign == $desired_callsign ){
+                  return true;
+                }
+              }
+            }
+          } 
+        }
+      }
+    }
+    // no luck finding the desired callsign
+    return false;
+  }
+
   public function visitor_ip_is_in_dma() {
     $ip = $this->get_remote_ip_address();
     $location = $this->get_location_from_ip($ip);
