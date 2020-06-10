@@ -193,7 +193,8 @@ and manually write out that DIV with a 'data-media' property with the value bein
   }
 
   public function metabox_content() {
-    global $post_id;
+    global $post;
+    $post_id = $post->ID;
     $post_data = get_post($post_id, ARRAY_A); // standardizing on an array for everything here
     $postmeta_data = get_post_custom($post_id);
 
