@@ -248,7 +248,12 @@ class PBS_Check_DMA {
   public function visitor_ip_is_in_dma() {
     $ip = $this->get_remote_ip_address();
     $location = $this->get_location_from_ip($ip);
-    $in_dma = $this->compare_county_to_allowed_list($location);
+    $defaults = get_option($this->token);
+    if (!empty($defaults['use_pbs_location_api'])) {
+      $in_dma = $this->callsign_available_in_zipcode($location['zipcode'], $defaults['station_call_letters']); 
+    } else {
+      $in_dma = $this->compare_county_to_allowed_list($location);
+    }
     return array($in_dma, "location" => $location);
   }
 
