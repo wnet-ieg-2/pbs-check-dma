@@ -67,15 +67,17 @@ if (empty($_POST['media_id'])) {
     }
   } 
 
-  $allowed_counties_ary = $api->format_counties_setting_for_use();
+  
   $allowed_counties_string = '';
-  foreach ($allowed_counties_ary as $state => $counties) {
-    if ($allowed_counties_string) {
-      $allowed_counties_string .="; ";
+  if (empty($defaults['use_pbs_location_api'])) {
+    $allowed_counties_ary = $api->format_counties_setting_for_use();
+    foreach ($allowed_counties_ary as $state => $counties) {
+      if ($allowed_counties_string) {
+        $allowed_counties_string .="; ";
+      }
+      $allowed_counties_string .= $state . ": " . implode(", ", $counties);
     }
-    $allowed_counties_string .= $state . ": " . implode(", ", $counties);
   }
-
 
   $location_string = "";
   if ($location) {
@@ -101,7 +103,11 @@ if (empty($_POST['media_id'])) {
         $playerstring = "<div id = 'custom_hls_player' data-hls='" . $postmeta['dma_restricted_video_uri'][0] . "'></div>";
       }
     }
-    $return["output"] = "<!-- DUE TO CONTRACTUAL OBLIGATIONS, IT IS PROHIBITED TO PLAY THE VIDEO BELOW ON DEVICES THAT ARE NOT PHYSICALLY LOCATED WITHIN OUR BROADCAST AREA. THIS AREA IS COMPRISED OF THE FOLLOWING COUNTIES: $allowed_counties_string. PLEASE RESPECT THESE RIGHTS. Your device appears to be located in $location_string -->$playerstring";
+    $return["output"] = "<!-- DUE TO CONTRACTUAL OBLIGATIONS, IT IS PROHIBITED TO PLAY THE VIDEO BELOW ON DEVICES THAT ARE NOT PHYSICALLY LOCATED WITHIN THE BROADCAST AREA FOR $station_common_name.";
+    if (!empty($allowed_counties_string)) {
+      $return["output"] .= " THIS AREA IS COMPRISED OF THE FOLLOWING COUNTIES: $allowed_counties_string.";
+    }
+    $return["output"] .= " PLEASE RESPECT THESE RIGHTS. Your device appears to be located in $location_string -->$playerstring";
   } else {
     // it is almost impossible for thumbnail to be empty
     $thumbnail = !empty($_POST['thumbnail']) ? $_POST['thumbnail'] : $api->assets_url . '/img/mezz-default.gif';
@@ -111,7 +117,11 @@ if (empty($_POST['media_id'])) {
     } else {
       $location_string .= ". If this is not correct, <br /><br /><button class='retryDMALocation'>Re-check location <i class='fa fa-map-marker'></i> </button>"; 
     }
-    $return["output"] = "<div class='video-wrap dma-fail'><img src='$thumbnail'><div class='sorry'><div class='sorry-txt'><h3>Sorry, this content is only available to viewers within our broadcast area*.</h3><p>Check your <a href='https://www.pbs.org/tv_schedules/' target='_blank'>local PBS listings</a> to find out where you can watch.</p><p>*Our broadcast area contains the following counties:  $allowed_counties_string.</p><p>Your device appears to be located in $location_string</p></div></div></div>";
+    $return["output"] = "<div class='video-wrap dma-fail'><img src='$thumbnail'><div class='sorry'><div class='sorry-txt'><h3>Sorry, this content is only available to viewers within the broadcast area for $station_common_name*.</h3><p>Check your <a href='https://www.pbs.org/tv_schedules/' target='_blank'>local PBS listings</a> to find out where you can watch.</p>";
+    if (!empty($allowed_counties_string)) {
+      $return["output"] .= "<p>*Our broadcast area contains the following counties:  $allowed_counties_string.</p>";
+    }
+    $return["output"] .= "<p>Your device appears to be located in $location_string</p></div></div></div>";
   }
 }
 
