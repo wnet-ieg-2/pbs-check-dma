@@ -211,18 +211,18 @@ and manually write out that DIV with a 'data-media' property with the value bein
       $html .= '<label for="dma_restricted_video_uri">Stream URI</label><div class="description"><i>URI for the HLS stream that will be played.</i></div>';
       $html .= '<input type="text" name="dma_restricted_video_uri" id="dma_restricted_video_uri" class="regular-text" value = ' . $vid_uri . '><br />';
       $vid_image = !empty($postmeta_data['dma_restricted_video_image'][0]) ? $postmeta_data['dma_restricted_video_image'][0] : '';
-      $html .= '<label for="dma_restricted_video_image">Preview image</label><div class="description"><i>URI for 16x9 mezz image for vid preview</i></div>';
+      $html .= '<label for="dma_restricted_video_image">Preview image</label><div class="description"><i>URI for 16x9 mezz image for vid preview -- make sure to check "DMA-restrict video" to be able to use the Media Library to add</i></div>';
       $html .= '<input type="text" name="dma_restricted_video_image" id="dma_restricted_video_image" class="regular-text" value = ' . $vid_image . '><button class="upload-image button-primary" data-field="dma_restricted_video_image"><span class="dashicons dashicons-camera"></span></button><br />';
       $html .= "<p class='description'>You can make the DMA restricted player with the video and image above display by adding the shortcode <code>[dma_restricted_player]</code> to the content if on this page, or on other posts or pages use <br /><code>[dma_restricted_player post_id=$post_id]</code></p>";
      
 
 
- 
+      if (!empty($checked)) { 
       $html .= <<<EOF
   <script>
   jQuery(document).ready( function( $ ) {
 
-    $('button.upload-image').click(function() {
+    $('#pbs_check_dma button.upload-image').click(function() {
     field = $(this).data('field');
         tb_show( '', 'media-upload.php?type=image&amp;TB_iframe=true' );
         return false;
@@ -238,7 +238,7 @@ and manually write out that DIV with a 'data-media' property with the value bein
 });
 </script>
 EOF;
-
+      }
     }
 
     echo $html;
