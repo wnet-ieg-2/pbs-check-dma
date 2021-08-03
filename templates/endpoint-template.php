@@ -7,6 +7,7 @@ remove_all_actions('wp_header',1);
 $api = new PBS_Check_DMA();
 $defaults = get_option($api->token);
 $station_common_name = !empty($defaults['station_common_name']) ? $defaults['station_common_name'] : ""; 
+$call_letters_lc = $defaults['station_call_letters'];
 $return = array();
 
 if (empty($_POST['media_id'])) {
@@ -95,7 +96,7 @@ if (empty($_POST['media_id'])) {
   if ($in_dma) {
     $media_id = $_POST['media_id'];
     // Partner Player
-    $playerstring = "<div class='video-wrap'><iframe src='//player.pbs.org/widget/partnerplayer/$media_id/?chapterbar=false&endscreen=false' frameborder='0' marginwidth='0' marginheight='0' scrolling='no' webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe></div>";
+    $playerstring = "<div class='video-wrap'><iframe src='//player.pbs.org/widget/partnerplayer/$media_id/?chapterbar=false&endscreen=false&callsign=$call_letters_lc' frameborder='0' marginwidth='0' marginheight='0' scrolling='no' webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe></div>";
     if (!empty($_POST['postid'] && $media_id == 'custom_hls')) {
       $postmeta = get_post_meta($_POST['postid']);
       if (!empty($postmeta['dma_restricted_video_uri'][0])) {
