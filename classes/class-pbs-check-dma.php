@@ -60,28 +60,13 @@ class PBS_Check_DMA {
   public function get_location_from_ip($client_ip) {
     $zip_url = 'https://services.pbs.org/zipcodes/ip/';
     $combined_url = $zip_url . $client_ip . '.json';
-
-    $ch = curl_init();
-
-    curl_setopt($ch, CURLOPT_URL, $combined_url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($ch, CURLOPT_HEADER, FALSE);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE); // Only for debugging locally
-
-    $response = curl_exec($ch);
-    $info = curl_getinfo($ch);
-    $errors = curl_error($ch);
-    curl_close($ch);
-
-    //$response = wp_remote_get($combined_url, array());
-    //error_log(json_encode($response));
-    //error_log(json_encode(openssl_get_cert_locations()));
-    //error_log("openssl.cafile: " . ini_get('openssl.cafile'));
-    //error_log("curl.cainfo: " . ini_get('curl.cainfo'));
-    if (!empty($errors)) {
+    $response = wp_remote_get($combined_url, array());
+    if ( is_array( $response ) ) {
+      $header = $response['headers']; // array of http header lines
+      $body = $response['body']; // use the content
+    } else {
       return array('errors' => $response);
     }
-    $body = $response;
     if ($body) {
       $parsed = json_decode($body, TRUE);
       $item = !empty($parsed['$items'][0]) ? $parsed['$items'][0] : false;
