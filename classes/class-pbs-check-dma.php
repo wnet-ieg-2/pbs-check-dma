@@ -230,7 +230,7 @@ class PBS_Check_DMA {
         if (isset( $link['$links'] )) {
           foreach($link['$links'] as $i) {
             if($i['$relationship'] == "flagship"){
-              if(  $key['confidence'] == 100 AND ( $key['rank'] == 1 OR !isset($key['rank']) )  ){
+              if(  $key['confidence'] == 100  ){
                 $call_sign = $key['$links'][0]['callsign'];
                 if ( $call_sign == $desired_callsign ){
                   return true;
