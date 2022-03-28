@@ -94,10 +94,13 @@ class PBS_Check_DMA {
 
   public function get_remote_ip_address() {
     if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-        return $_SERVER['HTTP_CLIENT_IP'];
+      return $_SERVER['HTTP_CLIENT_IP'];
 
     } else if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        return $_SERVER['HTTP_X_FORWARDED_FOR'];
+      // this can return a list, we only want the first one
+      $ip_array=explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+      $last_ip = trim(array_shift($ip_array));
+      return $last_ip;
     }
     return $_SERVER['REMOTE_ADDR'];
   }
