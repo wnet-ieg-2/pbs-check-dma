@@ -17,7 +17,7 @@ class PBS_Check_DMA {
 		$this->assets_dir = trailingslashit( $this->dir ) . 'assets';
 		$this->assets_url = trailingslashit(plugin_dir_url( __DIR__ ) ) . 'assets';
     $this->token = 'pbs_check_dma';
-    $this->version = '0.80';
+    $this->version = '0.90';
 
 		// Load public-facing style sheet and JavaScript.
 		//add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
