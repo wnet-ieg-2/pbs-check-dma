@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: PBS Check DMA 
- * Version: 0.80 - livestream status disabled
+ * Version: 0.90 - updated here.com API
  * Plugin URI: http://ieg.wnet.org/
  * Description: Use geolocation to restrict content based on a PBS stations' DMA
  * Author: William Tam

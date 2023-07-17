@@ -17,7 +17,7 @@ class PBS_Check_DMA {
 		$this->assets_dir = trailingslashit( $this->dir ) . 'assets';
 		$this->assets_url = trailingslashit(plugin_dir_url( __DIR__ ) ) . 'assets';
     $this->token = 'pbs_check_dma';
-    $this->version = '0.80';
+    $this->version = '0.90';
 
 		// Load public-facing style sheet and JavaScript.
 		//add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -132,9 +132,9 @@ class PBS_Check_DMA {
       
     switch($provider) {
       case "here.com" :
-        $requesturl = "https://reverse.geocoder.api.here.com/6.2/reversegeocode.json?gen=9&mode=retrieveAreas";
-        $requesturl .= "&" . $authentication;
-        $requesturl .= "&prox=$latitude,$longitude";
+        $requesturl = "https://revgeocode.search.hereapi.com/v1/revgeocode";
+        $requesturl .= "?apiKey=" . $authentication;
+        $requesturl .= "&at=$latitude,$longitude";
         break;
       case "fcc.gov" :
         $requesturl = "https://geo.fcc.gov/api/census/area?";
@@ -166,11 +166,17 @@ class PBS_Check_DMA {
     // every provider has a different result format.  Format for our needs.
     switch($provider) {
       case "here.com" :
-        if (empty($parsed["Response"]["View"][0]["Result"][0]["Location"]["Address"])) {
+        if (empty($parsed["items"][0]["address"])) {
           return array('errors' => "No address", 'response' => $parsed["Response"]);
         }
-        $address = $parsed["Response"]["View"][0]["Result"][0]["Location"]["Address"];
-        $return = array("zipcode" => $address["PostalCode"], "state" => $address["State"], "county" => $address["County"], "country" => $address["Country"]);
+        $address = $parsed["items"][0]["address"];
+        $zipcode = $address["postalCode"];
+        if (strlen($zipcode) > 5) {
+          // zip+4 doesn't work with PBS
+          $zipcode = substr($zipcode, 0, 5);
+        }   
+    
+        $return = array("zipcode" => $zipcode, "state" => $address["stateCode"], "county" => $address["county"], "country" => $address["countryCode"]);
         break;
       case "fcc.gov" :
         if (empty($parsed["results"][0]["county_name"])) {
