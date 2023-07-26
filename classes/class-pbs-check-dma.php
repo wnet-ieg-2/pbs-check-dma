@@ -17,7 +17,7 @@ class PBS_Check_DMA {
 		$this->assets_dir = trailingslashit( $this->dir ) . 'assets';
 		$this->assets_url = trailingslashit(plugin_dir_url( __DIR__ ) ) . 'assets';
     $this->token = 'pbs_check_dma';
-    $this->version = '0.90';
+    $this->version = '0.92';
 
 		// Load public-facing style sheet and JavaScript.
 		//add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -317,13 +317,20 @@ class PBS_Check_DMA {
     if (!empty($postmeta['dma_restricted_video_uri'][0])) {
       $defaults = get_option($this->token);
       $jwplayer_uri = !empty($defaults['jwplayer_uri']) ? trim($defaults['jwplayer_uri']) : '';
-      if (empty($jwplayer_uri)) { return; }
+      $data_type = "custom_hls";
+      if (empty($jwplayer_uri)) { 
+        $data_type = "custom_mp4";
+      }
       $mezz_image = $this->assets_url . "/img/mezz-default.gif";
       if (!empty($postmeta['dma_restricted_video_image'][0])) {
         $mezz_image = $postmeta['dma_restricted_video_image'][0];
       }
-      $return = '<div class="dmarestrictedplayer program-player" data-media="custom_hls" data-postid="' . $post_id . '"><img src="'.$mezz_image.'" /></div>';
-      $return .= "<link rel=stylesheet media='all' type='text/css' href='" . $this->assets_url . "/css/pbs_check_dma.css?version=" . $this->version . "' /><script src='$jwplayer_uri'></script><script src='" . $this->assets_url . "/js/pbs_check_dma.js?version=" . $this->version . "'></script>";
+      $return = '<div class="dmarestrictedplayer program-player" data-media="' . $data_type . '" data-postid="' . $post_id . '"><img src="'.$mezz_image.'" /></div><link rel=stylesheet media="all" type="text/css" href="' . $this->assets_url . '/css/pbs_check_dma.css?version=' . $this->version . '" /><script src="' . $this->assets_url . '/js/pbs_check_dma.js?version=' . $this->version . '"></script>';
+      if ($data_type ==  "custom_hls") {
+        $return .= "<script src='$jwplayer_uri'></script>";
+      } else {
+        $return .="<link rel=stylesheet media='all' type='text/css' href='https://vjs.zencdn.net/8.3.0/video-js.css'/><style> .vjs-poster{ background-size: 100% !important; } </style><script src='https://vjs.zencdn.net/8.3.0/video.min.js'></script>";
+      }
      }
     return $return;
   }

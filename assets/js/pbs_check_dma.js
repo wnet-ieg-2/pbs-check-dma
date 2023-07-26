@@ -31,14 +31,14 @@ jQuery(document).ready(function($) {
            * undefined means we dont need to know anymore  */
           playerdiv.html(response.output);
           $('.retryDMALocation').on("click", resetDMA );
-          playCustomHLSIfPresent();
+          playCustomStreamIfPresent();
         } else {
           if (!navigator.geolocation || declined_location) {
             /* still possibly to have a playable video:
              *  maybe IP geolcation worked, maybe it didnt */
             playerdiv.html(response.output);
             $('.retryDMALocation').on("click", resetDMA );
-            playCustomHLSIfPresent();
+            playCustomStreamIfPresent();
           } else {
             navigator.geolocation.getCurrentPosition(function(position) {
               browser_lat = position.coords.latitude;
@@ -51,24 +51,41 @@ jQuery(document).ready(function($) {
     });
   }
 
-  function playCustomHLSIfPresent() {
+  function playCustomStreamIfPresent() {
+    var player_type = 'hls';
     if ($('#custom_hls_player').length == 0) {
-      // this script doesnt apply so be done.
-      return;
+      if ($('#custom_mp4_player').length == 0) {
+        // this script doesnt apply so be done.
+        return;
+      } 
+      player_type = 'mp4';
     }
-    var player = $('#custom_hls_player');
+    if (player_type == 'mp4') {
+      var player = $('#custom_mp4_player');
+    } else {
+      var player = $('#custom_hls_player');
+    }
     if (typeof(player.data('postid') !== 'undefined') && player.data('postid')) {
       postid = player.data('postid');
     }
-    if (typeof(player.data('hls') !== 'undefined') && player.data('hls')) {
-      hls = player.data('hls');
+    if (typeof(player.data('media') !== 'undefined') && player.data('media')) {
+      media = player.data('media');
     }
-    var playerargs = {'file': hls, width: '100%', image: thumb };
-    if (typeof(userstarted) !== 'undefined'){
-      playerargs['autostart'] = userstarted;
-    }
-    if (typeof(jwplayer("custom_hls_player").getState()) === 'undefined') {
-      jwplayer("custom_hls_player").setup(playerargs).on('error', jwperrorhandler).on('play', function() {userstarted = true; console.log("user started"); jwResetUnknownCC(); }).on('captionsList', jwResetUnknownCC);
+    if ( player_type == 'hls' ) {
+      var playerargs = {'file': media, width: '100%', image: thumb };
+      if (typeof(userstarted) !== 'undefined'){
+        playerargs['autostart'] = userstarted;
+      }
+      if (typeof(jwplayer("custom_hls_player").getState()) === 'undefined') {
+        jwplayer("custom_hls_player").setup(playerargs).on('error', jwperrorhandler).on('play', function() {userstarted = true; console.log("user started"); jwResetUnknownCC(); }).on('captionsList', jwResetUnknownCC);
+      }
+    } else {
+      // draw a video-js player
+      var setupargs = '"poster": "' + thumb + '"';
+      var vdjs_string = "<video-js id='vidjslivestream' controls preload='auto' data-setup='{"+setupargs+"}' class='vjs-16-9 vjs-big-play-centered'><source src='"+media+"' type='application/x-mpegURL' /></video-js>";
+      $('#custom_mp4_player').append(vdjs_string);
+      const vid = document.getElementById('vidjslivestream');
+      const player = videojs(vid);
     }
   }
 
