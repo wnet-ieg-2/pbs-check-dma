@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: PBS Check DMA 
- * Version: 0.91 - enabled switch to video.js
+ * Version: 0.92 - enabled switch to video.js
  * Plugin URI: http://ieg.wnet.org/
  * Description: Use geolocation to restrict content based on a PBS stations' DMA
  * Author: William Tam

@@ -84,7 +84,7 @@ jQuery(document).ready(function($) {
       var setupargs = '"poster": "' + thumb + '"';
       var vdjs_string = "<video-js id='vidjslivestream' controls preload='auto' data-setup='{"+setupargs+"}' class='vjs-16-9 vjs-big-play-centered'><source src='"+media+"' type='application/x-mpegURL' /></video-js>";
       $('#custom_mp4_player').append(vdjs_string);
-      const vid = document.getElementById('vidjslivestresm');
+      const vid = document.getElementById('vidjslivestream');
       const player = videojs(vid);
     }
   }
