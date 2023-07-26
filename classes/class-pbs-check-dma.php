@@ -325,11 +325,11 @@ class PBS_Check_DMA {
       if (!empty($postmeta['dma_restricted_video_image'][0])) {
         $mezz_image = $postmeta['dma_restricted_video_image'][0];
       }
-      $return = '<div class="dmarestrictedplayer program-player" data-media="' . $data_type . '" data-postid="' . $post_id . '"><img src="'.$mezz_image.'" /></div>';
+      $return = '<div class="dmarestrictedplayer program-player" data-media="' . $data_type . '" data-postid="' . $post_id . '"><img src="'.$mezz_image.'" /></div><link rel=stylesheet media="all" type="text/css" href="' . $this->assets_url . '"/css/pbs_check_dma.css?version=' . $this->version . ' />script src="' . $this->assets_url . '/js/pbs_check_dma.js?version=' . $this->version . '"></script>';
       if ($data_type ==  "custom_hls") {
-        $return .= "<link rel=stylesheet media='all' type='text/css' href='" . $this->assets_url . "/css/pbs_check_dma.css?version=" . $this->version . "' /><script src='$jwplayer_uri'></script><script src='" . $this->assets_url . "/js/pbs_check_dma.js?version=" . $this->version . "'></script>";
+        $return .= "<script src='$jwplayer_uri'></script>";
       } else {
-        $return .="<link rel=stylesheet media='all' type='text/css' href='https://vjs.zencdn.net/8.3.0/video-js.css'/><style> .vjs-poster{ background-size: 100% !important; } </style><script src='https://vjs.zencdn.net/8.3.0/video.min.js'></script><script src='" . $this->assets_url . "/js/pbs_check_dma.js?version=" . $this->version . "'></script>";
+        $return .="<link rel=stylesheet media='all' type='text/css' href='https://vjs.zencdn.net/8.3.0/video-js.css'/><style> .vjs-poster{ background-size: 100% !important; } </style><script src='https://vjs.zencdn.net/8.3.0/video.min.js'></script>";
       }
      }
     return $return;
