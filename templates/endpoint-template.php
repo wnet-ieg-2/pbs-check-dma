@@ -97,11 +97,15 @@ if (empty($_POST['media_id'])) {
     $media_id = $_POST['media_id'];
     // Partner Player
     $playerstring = "<div class='video-wrap'><iframe src='//player.pbs.org/widget/partnerplayer/$media_id/?chapterbar=false&endscreen=false&callsign=$call_letters_lc' frameborder='0' marginwidth='0' marginheight='0' scrolling='no' webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe></div>";
-    if (!empty($_POST['postid'] && $media_id == 'custom_hls')) {
+    if (!empty($_POST['postid']) && ($media_id == 'custom_hls' || $media_id == 'custom_mp4')) {
       $postmeta = get_post_meta($_POST['postid']);
       if (!empty($postmeta['dma_restricted_video_uri'][0])) {
-        // JW Player if there's a custom HLS
-        $playerstring = "<div id = 'custom_hls_player' data-hls='" . $postmeta['dma_restricted_video_uri'][0] . "'></div>";
+        $div_id = 'custom_mp4_player';
+        if ($media_id == 'custom_hls' ) {
+          // JW Player if there's a custom HLS, otherwise video.js
+           $div_id = 'custom_hls_player';
+        }
+        $playerstring = "<div id = '" . $div_id . "' data-media='" . $postmeta['dma_restricted_video_uri'][0] . "'></div>";
       }
     }
     $return["output"] = "<!-- DUE TO CONTRACTUAL OBLIGATIONS, IT IS PROHIBITED TO PLAY THE VIDEO BELOW ON DEVICES THAT ARE NOT PHYSICALLY LOCATED WITHIN THE BROADCAST AREA FOR $station_common_name.";
