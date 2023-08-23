@@ -180,7 +180,6 @@ class PBS_Check_DMA {
           // zip+4 doesn't work with PBS
           $zipcode = substr($zipcode, 0, 5);
         }   
-        error_log(json_encode($address));
         $county = isset($address["county"]) ? $address["county"] : $address["district"]; 
         $return = array("zipcode" => $zipcode, "state" => $address["stateCode"], "county" => $county, "country" => $address["countryCode"]);
         break;
