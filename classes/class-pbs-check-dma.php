@@ -17,7 +17,7 @@ class PBS_Check_DMA {
 		$this->assets_dir = trailingslashit( $this->dir ) . 'assets';
 		$this->assets_url = trailingslashit(plugin_dir_url( __DIR__ ) ) . 'assets';
     $this->token = 'pbs_check_dma';
-    $this->version = '0.92';
+    $this->version = '0.93';
 
 		// Load public-facing style sheet and JavaScript.
 		//add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -141,10 +141,15 @@ class PBS_Check_DMA {
         $requesturl .= "&lat=$latitude&lon=$longitude";
         $requesturl .= "&format=json";
         break;
+      case "google" :
+        $requesturl = "https://maps.googleapis.com/maps/api/geocode/json";
+        $requesturl .= "?key=" . $authentication;
+        $requesturl .= "&latlng=$latitude,$longitude";
+        break;
     }
     // other providers TK
     if (empty($requesturl)) {
-      return array("errors" => "no reverse geolocation url can be constructed with provideer $provider");
+      return array("errors" => "no reverse geolocation url can be constructed with provider $provider");
     }
  
     $response = wp_remote_get($requesturl);
@@ -175,8 +180,8 @@ class PBS_Check_DMA {
           // zip+4 doesn't work with PBS
           $zipcode = substr($zipcode, 0, 5);
         }   
-    
-        $return = array("zipcode" => $zipcode, "state" => $address["stateCode"], "county" => $address["county"], "country" => $address["countryCode"]);
+        $county = isset($address["county"]) ? $address["county"] : $address["district"]; 
+        $return = array("zipcode" => $zipcode, "state" => $address["stateCode"], "county" => $county, "country" => $address["countryCode"]);
         break;
       case "fcc.gov" :
         if (empty($parsed["results"][0]["county_name"])) {
@@ -186,8 +191,35 @@ class PBS_Check_DMA {
         $result = $parsed["results"][0];
         $return = array("state" => $result["state_code"], "county" => $result["county_name"], "country" => "USA");
         break;
+      case "google" :
+        if (empty($parsed["results"][0]["address_components"])) {
+          return array('errors' => "No address", 'response' => $parsed);
+        }
+        // loop through the components to assign the pieces
+        $return = array();
+        foreach ($parsed["results"][0]["address_components"] as $address_component) {
+          $component_type = $address_component["types"][0]; // the second element is usually 'political'
+          switch ($component_type) {
+            case "postal_code" :
+              $return["zipcode"] = substr($address_component["short_name"], 0, 5);
+              break;
+            case "country" :
+              $return["country"] = $address_component["short_name"];
+              $return["country_code"] = $address_component["short_name"];
+              $return["country_name"] = $address_component["long_name"];
+              break;
+            case "administrative_area_level_1" :
+              $return["state"] = $address_component["short_name"];
+              break;
+            case "administrative_area_level_2" :
+              $return["county"] = $address_component["short_name"];
+              break;
+          }
+        }
+        break;
     }
     return $return;
+
   }
 
   public function compare_county_to_allowed_list($location) {
