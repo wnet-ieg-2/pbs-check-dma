@@ -17,7 +17,7 @@ class PBS_Check_DMA {
 		$this->assets_dir = trailingslashit( $this->dir ) . 'assets';
 		$this->assets_url = trailingslashit(plugin_dir_url( __DIR__ ) ) . 'assets';
     $this->token = 'pbs_check_dma';
-    $this->version = '0.93';
+    $this->version = '0.94';
 
 		// Load public-facing style sheet and JavaScript.
 		//add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -257,6 +257,20 @@ class PBS_Check_DMA {
         return false;
       }
     }
+
+    $available_callsigns = $this->list_available_callsigns_in_zipcode($zipcode);
+    if (in_array($desired_callsign, $available_callsigns)) {
+      return true;
+    }
+    // no luck finding the desired callsign
+    return false; 
+  }
+
+  public function list_available_callsigns_in_zipcode($zipcode) {
+    if (empty($zipcode) || !(preg_match('/^(\d{5})?$/', $zipcode))) {
+      // zipcode is either empty or isn't 5 digits
+      return false;
+    }
     $callsign_url = "https://services.pbs.org/callsigns/zip/";
     $combined_url = $callsign_url . $zipcode . '.json';
     $call_sign = false;
@@ -266,6 +280,7 @@ class PBS_Check_DMA {
     }
     $body = $response['body']; // use the content
     $parsed = json_decode($body, TRUE);
+    $available_callsigns = [];
     foreach($parsed['$items'] as $key) {
       foreach($key['$links'][0]['$links'] as $link) {
         if (isset( $link['$links'] )) {
@@ -273,18 +288,16 @@ class PBS_Check_DMA {
             if($i['$relationship'] == "flagship"){
               if(  $key['confidence'] == 100  ){
                 $call_sign = $key['$links'][0]['callsign'];
-                if ( $call_sign == $desired_callsign ){
-                  return true;
-                }
+                array_push($available_callsigns, $call_sign);
               }
             }
-          } 
+          }
         }
       }
     }
-    // no luck finding the desired callsign
-    return false;
+    return $available_callsigns;
   }
+
 
   public function visitor_ip_is_in_dma() {
     $ip = $this->get_remote_ip_address();
