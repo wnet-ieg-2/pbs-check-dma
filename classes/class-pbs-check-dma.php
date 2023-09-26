@@ -298,6 +298,38 @@ class PBS_Check_DMA {
     return $available_callsigns;
   }
 
+  public function list_available_station_ids_in_zipcode($zipcode) {
+    if (empty($zipcode) || !(preg_match('/^(\d{5})?$/', $zipcode))) {
+      // zipcode is either empty or isn't 5 digits
+      return false;
+    }
+    $callsign_url = "https://services.pbs.org/callsigns/zip/";
+    $combined_url = $callsign_url . $zipcode . '.json';
+    $call_sign = false;
+    $response = wp_remote_get($combined_url, array());
+    if (! is_array( $response ) || empty($response['body'])) {
+      return array('errors' => $response);
+    }
+    $body = $response['body']; // use the content
+    $parsed = json_decode($body, TRUE);
+    $available_station_ids = [];
+    foreach($parsed['$items'] as $key) {
+      foreach($key['$links'][0]['$links'] as $link) {
+        if (isset( $link['$links'] )) {
+          foreach($link['$links'] as $i) {
+            if($i['$relationship'] == "flagship"){
+              if(  $key['confidence'] == 100  ){
+                $station_id = $link['pbs_id'];
+                array_push($available_station_ids, $station_id);
+              }
+            }
+          }
+        }
+      }
+    }
+    return $available_station_ids;
+  }
+
 
   public function visitor_ip_is_in_dma() {
     $ip = $this->get_remote_ip_address();
