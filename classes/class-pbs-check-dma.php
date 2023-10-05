@@ -305,7 +305,6 @@ class PBS_Check_DMA {
     }
     $callsign_url = "https://services.pbs.org/callsigns/zip/";
     $combined_url = $callsign_url . $zipcode . '.json';
-    $call_sign = false;
     $response = wp_remote_get($combined_url, array());
     if (! is_array( $response ) || empty($response['body'])) {
       return array('errors' => $response);
@@ -328,6 +327,64 @@ class PBS_Check_DMA {
       }
     }
     return $available_station_ids;
+  }
+
+  public function list_localization_states() {
+    $services_endpoint = "https://services.pbs.org/states.json";
+    $response = wp_remote_get($services_endpoint, array());
+    if (! is_array( $response ) || empty($response['body'])) {
+      return array('errors' => $response);
+    }
+    $body = $response['body']; // use the content
+    $parsed = json_decode($body, TRUE);
+    $states = [];
+    foreach($parsed['$items'] as $item) {
+      $states[$item['state']] = array('state_name' => $item['state_name'], 'station_list' => $item['$self']);
+    }
+    return $states;
+  }
+
+  public function list_stations_in_state($state) {
+    // this function expects a 2-letter state.  Besides the 50, PBS has stations in PR, AS, UM, MP, VI
+    if (empty($state)) {
+      return;
+    }
+    $services_endpoint = "https://services.pbs.org/states/";
+    $response = wp_remote_get($services_endpoint . $state . "json", array());
+    if (! is_array( $response ) || empty($response['body'])) {
+      return array('errors' => $response);
+    }
+    $body = $response['body']; // use the content
+    $parsed = json_decode($body, TRUE);
+    $stations = []; 
+    foreach($parsed['$items'] as $item) {
+      if (isset($item['pbs_id'])) {
+        $stations[$item['pbs_id']] = array(
+          'common_name'=>$item['common_name'], 
+          'mailing_city' => $item['mailing_city'],
+          'mailing_state' => $item['mailing_state'],
+          'callsign' => $item['$links'][1]['callsign']
+        );
+      }
+    }
+    return $stations;
+  }
+
+  public function get_station_attributes($station_id) {
+    if (empty($station_id)) {
+      return;
+    }
+    $services_endpoint = "https://station.services.pbs.org/api/public/v1/stations/";
+    $response = wp_remote_get($services_endpoint . $station_id . "/", array());
+    if (! is_array( $response ) || empty($response['body'])) {
+      return array('errors' => $response);
+    }
+    $body = $response['body']; // use the content
+    $parsed = json_decode($body, TRUE);
+    if (isset($parsed['data']['attributes'])){
+      return $parsed['data']['attributes'];
+    }
+    return false;
   }
 
 
