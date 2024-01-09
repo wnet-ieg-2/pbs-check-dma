@@ -17,7 +17,7 @@ class PBS_Check_DMA {
 		$this->assets_dir = trailingslashit( $this->dir ) . 'assets';
 		$this->assets_url = trailingslashit(plugin_dir_url( __DIR__ ) ) . 'assets';
     $this->token = 'pbs_check_dma';
-    $this->version = '0.93';
+    $this->version = '0.94';
 
 		// Load public-facing style sheet and JavaScript.
 		//add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -257,6 +257,20 @@ class PBS_Check_DMA {
         return false;
       }
     }
+
+    $available_callsigns = $this->list_available_callsigns_in_zipcode($zipcode);
+    if (in_array($desired_callsign, $available_callsigns)) {
+      return true;
+    }
+    // no luck finding the desired callsign
+    return false; 
+  }
+
+  public function list_available_callsigns_in_zipcode($zipcode) {
+    if (empty($zipcode) || !(preg_match('/^(\d{5})?$/', $zipcode))) {
+      // zipcode is either empty or isn't 5 digits
+      return false;
+    }
     $callsign_url = "https://services.pbs.org/callsigns/zip/";
     $combined_url = $callsign_url . $zipcode . '.json';
     $call_sign = false;
@@ -266,6 +280,7 @@ class PBS_Check_DMA {
     }
     $body = $response['body']; // use the content
     $parsed = json_decode($body, TRUE);
+    $available_callsigns = [];
     foreach($parsed['$items'] as $key) {
       foreach($key['$links'][0]['$links'] as $link) {
         if (isset( $link['$links'] )) {
@@ -273,18 +288,105 @@ class PBS_Check_DMA {
             if($i['$relationship'] == "flagship"){
               if(  $key['confidence'] == 100  ){
                 $call_sign = $key['$links'][0]['callsign'];
-                if ( $call_sign == $desired_callsign ){
-                  return true;
-                }
+                array_push($available_callsigns, $call_sign);
               }
             }
-          } 
+          }
         }
       }
     }
-    // no luck finding the desired callsign
+    return $available_callsigns;
+  }
+
+  public function list_available_station_ids_in_zipcode($zipcode) {
+    if (empty($zipcode) || !(preg_match('/^(\d{5})?$/', $zipcode))) {
+      // zipcode is either empty or isn't 5 digits
+      return false;
+    }
+    $callsign_url = "https://services.pbs.org/callsigns/zip/";
+    $combined_url = $callsign_url . $zipcode . '.json';
+    $response = wp_remote_get($combined_url, array());
+    if (! is_array( $response ) || empty($response['body'])) {
+      return array('errors' => $response);
+    }
+    $body = $response['body']; // use the content
+    $parsed = json_decode($body, TRUE);
+    $available_station_ids = [];
+    foreach($parsed['$items'] as $key) {
+      foreach($key['$links'][0]['$links'] as $link) {
+        if (isset( $link['$links'] )) {
+          foreach($link['$links'] as $i) {
+            if($i['$relationship'] == "flagship"){
+              if(  $key['confidence'] == 100  ){
+                $station_id = $link['pbs_id'];
+                array_push($available_station_ids, $station_id);
+              }
+            }
+          }
+        }
+      }
+    }
+    return $available_station_ids;
+  }
+
+  public function list_localization_states() {
+    $services_endpoint = "https://services.pbs.org/states.json";
+    $response = wp_remote_get($services_endpoint, array());
+    if (! is_array( $response ) || empty($response['body'])) {
+      return array('errors' => $response);
+    }
+    $body = $response['body']; // use the content
+    $parsed = json_decode($body, TRUE);
+    $states = [];
+    foreach($parsed['$items'] as $item) {
+      $states[$item['state']] = array('state_name' => $item['state_name'], 'station_list' => $item['$self']);
+    }
+    return $states;
+  }
+
+  public function list_stations_in_state($state) {
+    // this function expects a 2-letter state.  Besides the 50, PBS has stations in PR, AS, UM, MP, VI
+    if (empty($state)) {
+      return;
+    }
+    $services_endpoint = "https://services.pbs.org/states/";
+    $response = wp_remote_get($services_endpoint . $state . "json", array());
+    if (! is_array( $response ) || empty($response['body'])) {
+      return array('errors' => $response);
+    }
+    $body = $response['body']; // use the content
+    $parsed = json_decode($body, TRUE);
+    $stations = []; 
+    foreach($parsed['$items'] as $item) {
+      if (isset($item['pbs_id'])) {
+        $stations[$item['pbs_id']] = array(
+          'common_name'=>$item['common_name'], 
+          'mailing_city' => $item['mailing_city'],
+          'mailing_state' => $item['mailing_state'],
+          'callsign' => $item['$links'][1]['callsign']
+        );
+      }
+    }
+    return $stations;
+  }
+
+  public function get_station_attributes($station_id) {
+    if (empty($station_id)) {
+      return;
+    }
+    $services_endpoint = "https://station.services.pbs.org/api/public/v1/stations/";
+    $response = wp_remote_get($services_endpoint . $station_id . "/", array());
+    if (! is_array( $response ) || empty($response['body'])) {
+      return array('errors' => $response);
+    }
+    $body = $response['body']; // use the content
+    $parsed = json_decode($body, TRUE);
+    if (isset($parsed['data']['attributes'])){
+      return $parsed['data']['attributes'];
+    }
     return false;
   }
+
 
   public function visitor_ip_is_in_dma() {
     $ip = $this->get_remote_ip_address();
