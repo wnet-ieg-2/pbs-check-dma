@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: PBS Check DMA 
- * Version: 0.93 - adding Google as a reverse geolocator
+ * Version: 0.94 - adding function to return list of station ids in a state
  * Plugin URI: http://ieg.wnet.org/
  * Description: Use geolocation to restrict content based on a PBS stations' DMA
  * Author: William Tam
