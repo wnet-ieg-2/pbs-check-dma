@@ -329,6 +329,31 @@ class PBS_Check_DMA {
     return $available_station_ids;
   }
 
+  public function list_available_station_ids_in_state($state) {
+   if (empty($state) || !(preg_match('/^([A-Z]{2})?$/', $state))) {
+      // zipcode is either empty or isn't 2 letters
+      return false;
+    }
+    $callsign_url = "https://services.pbs.org/stations/state/";
+    $combined_url = $callsign_url . $state . '.json';
+    $response = wp_remote_get($combined_url, array());
+    if (! is_array( $response ) || empty($response['body'])) {
+      return array('errors' => $response);
+    }
+    $body = $response['body']; // use the content
+    $parsed = json_decode($body, TRUE);
+    $available_station_ids = [];
+    foreach($parsed['$items'] as $key) {
+      $link = $key['$links'][0];
+      if (isset($link['pbs_id'])) {
+          $station_id = $link['pbs_id'];
+          array_push($available_station_ids, $station_id);
+      }
+    }
+    return $available_station_ids;
+  }
+
+
   public function list_localization_states() {
     $services_endpoint = "https://services.pbs.org/states.json";
     $response = wp_remote_get($services_endpoint, array());
