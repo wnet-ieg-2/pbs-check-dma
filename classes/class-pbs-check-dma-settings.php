@@ -62,6 +62,7 @@ class PBS_Check_DMA_Settings {
 
     add_settings_field( 'jwplayer_uri', 'JW Player URI', array( $this, 'settings_field'), $this->token, 'generalsettings', array('setting' => $this->token, 'field' => 'jwplayer_uri', 'class' => 'regular-text', 'label' => 'Full URI to the JW Player javascript, unique to your JWPlayer.com account. <b>Leave blank to use video.js</b>', 'default' => '') );
 
+    add_settings_field('ip_zip_override', 'Override zipcode for IPs', array( $this, 'settings_field'), $this->token, 'generalsettings', array('setting' => $this->token, 'field' => 'ip_zip_override', 'class' => 'regular-text', 'type' => 'textarea', 'default' => '', 'label' => 'Add JSON formated pairs of IP -> zipcodes if you want a specific IP address to appear to be in a zipcode eg <br />[<br />{"127.0.0.1":"00001"},<br />{"127.0.0.2":"00002"}<br />]<br />NO TRAILING COMMA ON LAST PAIR, thats invalid JSON<br />Be kind and don\'t delete pairs from other people.'));
 	
 	}
 
@@ -138,7 +139,11 @@ class PBS_Check_DMA_Settings {
         echo '<select name="' . $settingname . '[' . $field . ']" id="' . $settingname . '[' . $field . ']" class="' . $class . '">' . $optionlist . '</select>';
         echo '<label for="' . $field . '"><p class="description">' . $label . '</p></label>';
         break;
-
+      case 'textarea' :
+        $value = (($setting[$field] && strlen(trim($setting[$field]))) ? $setting[$field] : $default);
+        echo '<textarea name="' . $settingname . '[' . $field . ']" id="' . $settingname . '[' . $field . ']" cols=60 rows=5 >' . $value . '</textarea><p class="description">' . $args['label'] . '</p>';
+        break;
+ 
       default:
         // any case other than selects, radios, checkboxes, or textareas formats like a text input
         $value = (($setting[$field] && strlen(trim($setting[$field]))) ? $setting[$field] : $default);

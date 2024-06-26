@@ -17,7 +17,7 @@ class PBS_Check_DMA {
 		$this->assets_dir = trailingslashit( $this->dir ) . 'assets';
 		$this->assets_url = trailingslashit(plugin_dir_url( __DIR__ ) ) . 'assets';
     $this->token = 'pbs_check_dma';
-    $this->version = '0.94';
+    $this->version = '1.01';
 
 		// Load public-facing style sheet and JavaScript.
 		//add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -58,6 +58,8 @@ class PBS_Check_DMA {
   }
 
   public function get_location_from_ip($client_ip) {
+    #possibly manually override the zipcode
+    $override_zipcode = $this->manually_override_zipcode_from_ip($client_ip);
     $zip_url = 'https://services.pbs.org/zipcodes/ip/';
     $combined_url = $zip_url . $client_ip . '.json';
     $response = wp_remote_get($combined_url, array());
@@ -70,20 +72,22 @@ class PBS_Check_DMA {
     if ($body) {
       $parsed = json_decode($body, TRUE);
       $item = !empty($parsed['$items'][0]) ? $parsed['$items'][0] : false;
-      if (!$item) {
+      if (!$item && !$override_zipcode) {
         return array('errors' => $response);
       }
-      $zipcode = !empty($item['zipcode']) ? (string) $item['zipcode'] : '';
+      $zipcode = $override_zipcode ? $override_zipcode : $zipcode;
       $state = '';
       $county = '';
-      if (empty($item['$links']) || !is_array($item['$links'])) {
+      if (!$override_zipcode && (empty($item['$links']) || !is_array($item['$links']))) {
         return array('errors' => $response);
       }
-      foreach ($item['$links'] as $link) {
-        if ($link['$relationship'] == "related") {
-          $state = !empty($link['$items'][0]['$links'][0]['state']) ? $link['$items'][0]['$links'][0]['state'] : '';
-          $county = !empty($link['$items'][0]['county_name']) ? $link['$items'][0]['county_name'] : '';
-          break;
+      if (isset($item['$links'])) {
+        foreach ($item['$links'] as $link) {
+          if ($link['$relationship'] == "related") {
+            $state = !empty($link['$items'][0]['$links'][0]['state']) ? $link['$items'][0]['$links'][0]['state'] : '';
+            $county = !empty($link['$items'][0]['county_name']) ? $link['$items'][0]['county_name'] : '';
+            break;
+          }
         }
       }
       $country = !empty($zipcode) ? 'USA' : 'Outside of the US'; // the PBS endpoint returns a 404 for non-US IP addresses
@@ -103,6 +107,34 @@ class PBS_Check_DMA {
       return $last_ip;
     }
     return $_SERVER['REMOTE_ADDR'];
+  }
+
+  public function manually_override_zipcode_from_ip($client_ip) {
+    // returns false unless there's a manually override zipcode assigned to the ip
+    // in which case it returns the zipcode
+    $return = false;
+    $defaults = get_option($this->token);
+    if (!empty(trim($defaults['ip_zip_override']))) {
+      $ip_zip_override = str_replace("\n", "", $defaults['ip_zip_override']);
+      $ip_zip_override = str_replace("\r", "", $ip_zip_override);
+      if (json_decode($ip_zip_override)){
+        $json_ary = json_decode($ip_zip_override, true);
+        foreach ($json_ary as $pair) {
+          foreach ($pair as $ip => $zip) {
+            if (!filter_var($ip, FILTER_VALIDATE_IP)){
+              continue;
+            }
+            if ($client_ip == $ip) {
+              if (is_string($zip) && 1 === preg_match("/^[0-9]{5}$/", $zip)) {
+                $return = $zip;
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+    return $return;
   }
 
 
