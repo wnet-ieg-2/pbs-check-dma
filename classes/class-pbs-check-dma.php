@@ -95,6 +95,7 @@ class PBS_Check_DMA {
       }
       $country = !empty($zipcode) ? 'USA' : 'Outside of the US'; // the PBS endpoint returns a 404 for non-US IP addresses
       $return = array('zipcode' => $zipcode, 'state' => $state, 'county' => $county, 'country' => $country);
+      error_log("location is " . json_encode($return));
       return $return;
     }
   }
