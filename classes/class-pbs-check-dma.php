@@ -77,14 +77,14 @@ class PBS_Check_DMA {
         error_log("parse error");
         return array('errors' => $response);
       }
-      $zipcode = $override_zipcode ? $override_zipcode : $zipcode;
+      $zipcode = $override_zipcode ? $override_zipcode : false;
       $state = '';
       $county = '';
       if (!$override_zipcode && (empty($item['$links']) || !is_array($item['$links']))) {
         error_log("links error");
         return array('errors' => $response);
       }
-      if (isset($item['$links'])) {
+      if (is_array($item['$links'])) {
         foreach ($item['$links'] as $link) {
           if ($link['$relationship'] == "related") {
             $state = !empty($link['$items'][0]['$links'][0]['state']) ? $link['$items'][0]['$links'][0]['state'] : '';
