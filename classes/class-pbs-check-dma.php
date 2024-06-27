@@ -60,6 +60,7 @@ class PBS_Check_DMA {
   public function get_location_from_ip($client_ip) {
     #possibly manually override the zipcode
     $override_zipcode = $this->manually_override_zipcode_from_ip($client_ip);
+    error_log("override_zipcode is $override_zipcode");
     $zip_url = 'https://services.pbs.org/zipcodes/ip/';
     $combined_url = $zip_url . $client_ip . '.json';
     $response = wp_remote_get($combined_url, array());
@@ -73,12 +74,14 @@ class PBS_Check_DMA {
       $parsed = json_decode($body, TRUE);
       $item = !empty($parsed['$items'][0]) ? $parsed['$items'][0] : false;
       if (!$item && !$override_zipcode) {
+        error_log("parse error");
         return array('errors' => $response);
       }
       $zipcode = $override_zipcode ? $override_zipcode : $zipcode;
       $state = '';
       $county = '';
       if (!$override_zipcode && (empty($item['$links']) || !is_array($item['$links']))) {
+        error_log("links error");
         return array('errors' => $response);
       }
       if (isset($item['$links'])) {
