@@ -115,23 +115,20 @@ class PBS_Check_DMA {
     // in which case it returns the zipcode
     $return = false;
     $defaults = get_option($this->token);
-    if (!empty(trim($defaults['ip_zip_override']))) {
-      $ip_zip_override = str_replace("\n", "", $defaults['ip_zip_override']);
-      $ip_zip_override = str_replace("\r", "", $ip_zip_override);
-      if (json_decode($ip_zip_override)){
-        $json_ary = json_decode($ip_zip_override, true);
-        foreach ($json_ary as $pair) {
-          foreach ($pair as $ip => $zip) {
-            if (!filter_var($ip, FILTER_VALIDATE_IP)){
-              continue;
-            }
-            if ($client_ip == $ip) {
-              if (is_string($zip) && 1 === preg_match("/^[0-9]{5}$/", $zip)) {
-                $return = $zip;
-                break;
-              }
-            }
-          }
+    if (empty($defaults['ip_zip_override_array'])) {
+      return false;
+    }
+    $raw_pairs = $defaults['ip_zip_override_array'];
+    foreach ($raw_pairs as $pair) {
+      $this_ip = trim($pair['ip']);
+      if (!filter_var($this_ip, FILTER_VALIDATE_IP)){
+        continue;
+      }
+      if ($client_ip == $this_ip) {
+        $this_zip = trim($pair['zip']);
+        if (is_string($this_zip) && 1 === preg_match("/^[0-9]{5}$/", $this_zip)) {
+          $return = $this_zip;
+          break;
         }
       }
     }

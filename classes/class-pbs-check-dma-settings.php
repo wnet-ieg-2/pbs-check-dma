@@ -62,7 +62,8 @@ class PBS_Check_DMA_Settings {
 
     add_settings_field( 'jwplayer_uri', 'JW Player URI', array( $this, 'settings_field'), $this->token, 'generalsettings', array('setting' => $this->token, 'field' => 'jwplayer_uri', 'class' => 'regular-text', 'label' => 'Full URI to the JW Player javascript, unique to your JWPlayer.com account. <b>Leave blank to use video.js</b>', 'default' => '') );
 
-    add_settings_field('ip_zip_override', 'Override zipcode for IPs', array( $this, 'settings_field'), $this->token, 'generalsettings', array('setting' => $this->token, 'field' => 'ip_zip_override', 'class' => 'regular-text', 'type' => 'textarea', 'default' => '', 'label' => 'Add JSON formated pairs of IP -> zipcodes if you want a specific IP address to appear to be in a zipcode eg <br />[<br />{"127.0.0.1":"00001"},<br />{"127.0.0.2":"00002"}<br />]<br />NO TRAILING COMMA ON LAST PAIR, thats invalid JSON<br />Be kind and don\'t delete pairs from other people.'));
+    add_settings_field('ip_zip_override_array', 'Override zipcode for IPs', array( $this, 'settings_field'), $this->token, 'generalsettings', array('setting' => $this->token, 'field' => 'ip_zip_override_array', 'class' => 'regular-text', 'type' => 'array', 'options' => array('count_source' => 'ip_zip_count', 'ip' => array('label' => 'IP Num', 'class' => 'medium-text'), 'zip' => array('label' => '5-digit zipcode', 'class' => 'medium-text'), 'note' => array('label' => 'Note', 'class' => 'regular-text')), 'label' => 'For debugging issues outside your physical DMA. Enter a specific IP number and the zipcode you want to appear to be there. Put a note describing who its for, and delete when done testing.<br /><b>WARNING:</b> if you\'re in an office or home network, this will probably apply to ALL devices in that network making requests to this server, as they will appear to the server to have the same IP number.'));
+    add_settings_field( 'ip_zip_count', 'IP-Zip Count', array($this, 'settings_field'), $this->token, 'generalsettings', array('setting' => $this->token, 'field' => 'ip_zip_count', 'type' => 'text', 'default' => 1,  'label' => 'Increase from 1 if you need to have more IP zip overrides active. If you have more than 1 active and reduce back to 1, please save this page twice to remove any old data', 'class' => 'small-text') ); 
 	
 	}
 
@@ -73,7 +74,7 @@ class PBS_Check_DMA_Settings {
     $settingname = esc_attr( $args['setting'] );
     $setting = get_option($settingname);
     $field = esc_attr( $args['field'] );
-    $label = esc_attr( $args['label'] );
+    $label = !empty($args['label']) ? trim($args['label']) : '';
     $class = esc_attr( $args['class'] );
     $type = ($args['type'] ? esc_attr( $args['type'] ) : 'text' );
     $options = (is_array($args['options']) ? $args['options'] : array('true', 'false') );
