@@ -77,7 +77,8 @@ class PBS_Check_DMA {
         error_log("parse error");
         return array('errors' => $response);
       }
-      $zipcode = $override_zipcode ? $override_zipcode : false;
+      $zipcode = !empty($item['zipcode']) ? (string) $item['zipcode'] : '';
+      $zipcode = $override_zipcode ? $override_zipcode : $zipcode;
       $state = '';
       $county = '';
       if (!$override_zipcode && (empty($item['$links']) || !is_array($item['$links']))) {
